@@ -1,13 +1,26 @@
-﻿using System.Configuration;
-using System.Data;
+﻿using JanomeHR.Desktop.Services;
+using JanomeHR.Desktop.Views;
+using Microsoft.Extensions.DependencyInjection;
 using System.Windows;
 
 namespace JanomeHR.Desktop;
 
-/// <summary>
-/// Interaction logic for App.xaml
-/// </summary>
 public partial class App : Application
 {
-}
+    public static IServiceProvider Services { get; private set; } = null!;
 
+    protected override void OnStartup(StartupEventArgs e)
+    {
+        base.OnStartup(e);
+
+        var collection = new ServiceCollection();
+        collection.AddSingleton<ApiService>();
+        collection.AddTransient<LoginWindow>();
+        collection.AddTransient<MainWindow>();
+
+        Services = collection.BuildServiceProvider();
+
+        var login = Services.GetRequiredService<LoginWindow>();
+        login.Show();
+    }
+}

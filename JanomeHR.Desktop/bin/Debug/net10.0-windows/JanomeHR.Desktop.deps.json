@@ -9,6 +9,7 @@
       "JanomeHR.Desktop/1.0.0": {
         "dependencies": {
           "CommunityToolkit.Mvvm": "8.4.2",
+          "Microsoft.Extensions.DependencyInjection": "10.0.8",
           "Microsoft.Extensions.Http": "10.0.8",
           "Newtonsoft.Json": "13.0.4"
         },

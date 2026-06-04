@@ -12,23 +12,29 @@ public class InterviewService(AppDbContext db) : IInterviewService
     public async Task<List<InterviewResponseDto>> GetAllAsync(DateTime? date)
     {
         var query = db.Interviews
-            .Include(i => i.Application).ThenInclude(a => a.JobPosting)
+            .Include(i => i.Application)
+                .ThenInclude(a => a.JobPosting)
             .Include(i => i.Interviewer)
             .AsQueryable();
 
         if (date.HasValue)
-            query = query.Where(i => i.ScheduledAt.Date == date.Value.Date);
+        {
+            var startUtc = DateTime.SpecifyKind(date.Value.Date, DateTimeKind.Utc);
+            var endUtc   = startUtc.AddDays(1);
+            query = query.Where(i =>
+                i.ScheduledAt >= startUtc && i.ScheduledAt < endUtc);
+        }
 
-        return await query
-            .OrderBy(i => i.ScheduledAt)
-            .Select(i => ToDto(i))
-            .ToListAsync();
+        var list = await query.OrderBy(i => i.ScheduledAt).ToListAsync();
+
+        return list.Select(i => ToDto(i)).ToList();
     }
 
     public async Task<InterviewResponseDto?> GetByIdAsync(Guid id)
     {
         var i = await db.Interviews
-            .Include(i => i.Application).ThenInclude(a => a.JobPosting)
+            .Include(i => i.Application)
+                .ThenInclude(a => a.JobPosting)
             .Include(i => i.Interviewer)
             .FirstOrDefaultAsync(i => i.Id == id);
 
@@ -40,16 +46,21 @@ public class InterviewService(AppDbContext db) : IInterviewService
         if (!Enum.TryParse<InterviewType>(dto.Type, out var type))
             type = InterviewType.Onsite;
 
+        // แปลง ScheduledAt เป็น UTC
+        var scheduledUtc = dto.ScheduledAt.Kind == DateTimeKind.Utc
+            ? dto.ScheduledAt
+            : DateTime.SpecifyKind(dto.ScheduledAt, DateTimeKind.Utc);
+
         var interview = new Interview
         {
-            ApplicationId  = dto.ApplicationId,
-            InterviewerId  = dto.InterviewerId,
-            ScheduledAt    = dto.ScheduledAt,
+            ApplicationId   = dto.ApplicationId,
+            InterviewerId   = dto.InterviewerId,
+            ScheduledAt     = scheduledUtc,
             DurationMinutes = dto.DurationMinutes,
-            Type           = type,
-            Location       = dto.Location,
-            Status         = InterviewStatus.Scheduled,
-            Result         = InterviewResult.Pending,
+            Type            = type,
+            Location        = dto.Location,
+            Status          = InterviewStatus.Scheduled,
+            Result          = InterviewResult.Pending,
         };
 
         db.Interviews.Add(interview);
@@ -64,11 +75,14 @@ public class InterviewService(AppDbContext db) : IInterviewService
 
         await db.SaveChangesAsync();
 
-        await db.Entry(interview).Reference(i => i.Application)
-            .Query().Include(a => a.JobPosting).LoadAsync();
-        await db.Entry(interview).Reference(i => i.Interviewer).LoadAsync();
+        // reload with includes
+        var saved = await db.Interviews
+            .Include(i => i.Application)
+                .ThenInclude(a => a.JobPosting)
+            .Include(i => i.Interviewer)
+            .FirstAsync(i => i.Id == interview.Id);
 
-        return ToDto(interview);
+        return ToDto(saved);
     }
 
     public async Task<bool> UpdateResultAsync(Guid id, UpdateInterviewResultDto dto)
@@ -109,7 +123,7 @@ public class InterviewService(AppDbContext db) : IInterviewService
     private static InterviewResponseDto ToDto(Interview i) => new(
         i.Id,
         $"{i.Application.FirstName} {i.Application.LastName}",
-        i.Application.JobPosting?.Title ?? "",
+        i.Application?.JobPosting?.Title ?? "",
         i.Interviewer?.FullName ?? "",
         i.ScheduledAt,
         i.DurationMinutes,

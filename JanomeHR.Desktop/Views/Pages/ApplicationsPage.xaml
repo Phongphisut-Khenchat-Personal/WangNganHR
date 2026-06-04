@@ -1,0 +1,145 @@
+<Page x:Class="JanomeHR.Desktop.Views.Pages.ApplicationsPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Background="#F4F4F2"
+      FontFamily="{StaticResource AppFont}"
+      FontSize="{StaticResource FontSizeMin}">
+
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0" Margin="0,0,0,20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Border Grid.Column="0" Background="White" CornerRadius="8"
+                    BorderBrush="#E0DEDD" BorderThickness="1" Margin="0,0,10,0" Padding="18,16">
+                <StackPanel>
+                    <TextBlock x:Name="TxtTotalNew" Text="0"
+                               FontSize="{StaticResource FontSizeStat}"
+                               FontWeight="SemiBold" Foreground="#C8102E"/>
+                    <TextBlock Text="ใหม่วันนี้" Foreground="#6B6B6B" Margin="0,4,0,0"/>
+                </StackPanel>
+            </Border>
+            <Border Grid.Column="1" Background="White" CornerRadius="8"
+                    BorderBrush="#E0DEDD" BorderThickness="1" Margin="0,0,10,0" Padding="18,16">
+                <StackPanel>
+                    <TextBlock x:Name="TxtTotalReview" Text="0"
+                               FontSize="{StaticResource FontSizeStat}"
+                               FontWeight="SemiBold" Foreground="#B45309"/>
+                    <TextBlock Text="กำลังพิจารณา" Foreground="#6B6B6B" Margin="0,4,0,0"/>
+                </StackPanel>
+            </Border>
+            <Border Grid.Column="2" Background="White" CornerRadius="8"
+                    BorderBrush="#E0DEDD" BorderThickness="1" Margin="0,0,10,0" Padding="18,16">
+                <StackPanel>
+                    <TextBlock x:Name="TxtTotalInterview" Text="0"
+                               FontSize="{StaticResource FontSizeStat}"
+                               FontWeight="SemiBold" Foreground="#1D4ED8"/>
+                    <TextBlock Text="นัดสัมภาษณ์" Foreground="#6B6B6B" Margin="0,4,0,0"/>
+                </StackPanel>
+            </Border>
+            <Border Grid.Column="3" Background="White" CornerRadius="8"
+                    BorderBrush="#E0DEDD" BorderThickness="1" Padding="18,16">
+                <StackPanel>
+                    <TextBlock x:Name="TxtTotalPass" Text="0"
+                               FontSize="{StaticResource FontSizeStat}"
+                               FontWeight="SemiBold" Foreground="#1A7A4A"/>
+                    <TextBlock Text="ผ่านการพิจารณา" Foreground="#6B6B6B" Margin="0,4,0,0"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <Grid Grid.Row="1" Margin="0,0,0,16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBox x:Name="TxtSearch"
+                     Grid.Column="0"
+                     BorderBrush="#E0DEDD"
+                     Background="White"
+                     Margin="0,0,12,0"
+                     TextChanged="TxtSearch_TextChanged">
+                <TextBox.Style>
+                    <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="TextBox">
+                                    <Border Background="{TemplateBinding Background}"
+                                            BorderBrush="{TemplateBinding BorderBrush}"
+                                            BorderThickness="1.5" CornerRadius="6">
+                                        <ScrollViewer x:Name="PART_ContentHost" Margin="{TemplateBinding Padding}"/>
+                                    </Border>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </TextBox.Style>
+            </TextBox>
+            <ComboBox x:Name="CmbStatus" Grid.Column="1"
+                      Width="200" Margin="0,0,12,0"
+                      SelectionChanged="CmbStatus_SelectionChanged">
+                <ComboBoxItem Content="ทุกสถานะ" Tag=""/>
+                <ComboBoxItem Content="ใหม่" Tag="New"/>
+                <ComboBoxItem Content="กำลังพิจารณา" Tag="Review"/>
+                <ComboBoxItem Content="นัดสัมภาษณ์" Tag="Interview"/>
+                <ComboBoxItem Content="ผ่าน" Tag="Pass"/>
+                <ComboBoxItem Content="ไม่ผ่าน" Tag="Fail"/>
+            </ComboBox>
+            <Button Grid.Column="2" Content="🔄 รีเฟรช"
+                    Style="{StaticResource DarkButton}"
+                    Click="BtnRefresh_Click"/>
+        </Grid>
+
+        <Border Grid.Row="2" Background="White" CornerRadius="8"
+                BorderBrush="#E0DEDD" BorderThickness="1">
+            <DataGrid x:Name="DgApplications"
+                      AutoGenerateColumns="False"
+                      IsReadOnly="True"
+                      GridLinesVisibility="Horizontal"
+                      HeadersVisibility="Column"
+                      Background="White"
+                      BorderThickness="0"
+                      SelectionMode="Single"
+                      MouseDoubleClick="DgApplications_DoubleClick"
+                      HorizontalGridLinesBrush="#F0EEEB"
+                      AlternatingRowBackground="#FAFAF8">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="รหัส" Binding="{Binding ReferenceCode}" Width="110"/>
+                    <DataGridTextColumn Header="ชื่อ-นามสกุล" Binding="{Binding FullName}" Width="*"/>
+                    <DataGridTextColumn Header="ตำแหน่ง" Binding="{Binding JobPostingTitle}" Width="200"/>
+                    <DataGridTextColumn Header="เบอร์โทร" Binding="{Binding Phone}" Width="130"/>
+                    <DataGridTextColumn Header="ช่องทาง" Binding="{Binding SourceText}" Width="100"/>
+                    <DataGridTemplateColumn Header="สถานะ" Width="150">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Border CornerRadius="12"
+                                        Background="{Binding StatusColor}"
+                                        Padding="12,6" HorizontalAlignment="Left" Margin="4,0">
+                                    <TextBlock Text="{Binding StatusText}"
+                                               FontWeight="SemiBold"
+                                               Foreground="{Binding StatusTextColor}"/>
+                                </Border>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn Header="วันที่สมัคร"
+                                        Binding="{Binding CreatedAtText}" Width="140"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Border>
+
+        <TextBlock Grid.Row="3" x:Name="TxtCount"
+                   Foreground="#6B6B6B" Margin="0,12,0,0"/>
+    </Grid>
+</Page>

@@ -1,0 +1,69 @@
+@page "/"
+@inject ApiService Api
+@inject NavigationManager Nav
+
+<PageTitle>ตำแหน่งงานว่าง — Janome Thailand</PageTitle>
+
+<div class="hero">
+    <div class="hero-content">
+        <div class="hero-badge">ร่วมงานกับเรา</div>
+        <h1>ตำแหน่งงานว่าง<br/>Janome Thailand</h1>
+        <p>สแกน QR Code หรือกดสมัครได้เลย ไม่ต้องเดินมาที่ป้อมยาม</p>
+    </div>
+</div>
+
+<div class="container">
+    @if (_loading)
+    {
+        <div class="loading">
+            <div class="spinner"></div>
+            <p>กำลังโหลด...</p>
+        </div>
+    }
+    else if (!_jobs.Any())
+    {
+        <div class="empty">
+            <p>ขณะนี้ยังไม่มีตำแหน่งงานว่าง</p>
+        </div>
+    }
+    else
+    {
+        <div class="jobs-grid">
+            @foreach (var job in _jobs)
+            {
+                <div class="job-card" @onclick='() => Nav.NavigateTo($"/apply/{job.Id}")'>
+                    <div class="job-dept">@job.DepartmentName</div>
+                    <h2 class="job-title">@job.Title</h2>
+                    <p class="job-desc">@job.Description</p>
+                    <div class="job-meta">
+                        @if (job.SalaryMin.HasValue)
+                        {
+                            <span class="salary">
+                                ฿@job.SalaryMin.Value.ToString("N0")
+                                @if (job.SalaryMax.HasValue)
+                                { <text> – ฿@job.SalaryMax.Value.ToString("N0")</text> }
+                            </span>
+                        }
+                        <span class="positions">รับ @job.PositionsCount อัตรา</span>
+                    </div>
+                    <button class="btn-apply">สมัครงาน →</button>
+                </div>
+            }
+        </div>
+    }
+
+    <div class="track-section">
+        <p>สมัครแล้ว? <a href="/track">ติดตามสถานะใบสมัคร</a></p>
+    </div>
+</div>
+
+@code {
+    private List<JobPostingItem> _jobs = [];
+    private bool _loading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try { _jobs = await Api.GetActiveJobsAsync(); }
+        finally { _loading = false; }
+    }
+}

@@ -1,0 +1,166 @@
+@page "/apply/{JobId}"
+@inject ApiService Api
+@inject NavigationManager Nav
+
+<PageTitle>สมัครงาน — Janome Thailand</PageTitle>
+
+@if (_job is null && !_loading)
+{
+    <div class="container"><p>ไม่พบตำแหน่งงานนี้</p></div>
+    return;
+}
+
+@if (_submitted)
+{
+    <div class="success-screen">
+        <div class="success-icon">✓</div>
+        <h2>ส่งใบสมัครเรียบร้อยแล้ว!</h2>
+        <p>ทีม HR จะติดต่อกลับภายใน 3 วันทำการ</p>
+        <div class="ref-code">@_refCode</div>
+        <p class="ref-note">กรุณาจดรหัสนี้ไว้เพื่อติดตามสถานะ</p>
+        <button class="btn-track" @onclick='() => Nav.NavigateTo("/track")'>
+            ติดตามสถานะ
+        </button>
+    </div>
+    return;
+}
+
+<div class="form-hero">
+    <div class="back-btn" @onclick='() => Nav.NavigateTo("/")'>← กลับ</div>
+    @if (_job is not null)
+    {
+        <div class="job-badge">@_job.DepartmentName</div>
+        <h1>@_job.Title</h1>
+        <p>@_job.Description</p>
+    }
+</div>
+
+<div class="container">
+    <EditForm Model="_form" OnValidSubmit="HandleSubmit">
+        <DataAnnotationsValidator/>
+
+        <div class="form-section">
+            <div class="section-title">ข้อมูลส่วนตัว</div>
+            <div class="form-grid">
+                <div class="field">
+                    <label>ชื่อ <span class="req">*</span></label>
+                    <InputText @bind-Value="_form.FirstName" placeholder="ชื่อจริง"/>
+                </div>
+                <div class="field">
+                    <label>นามสกุล <span class="req">*</span></label>
+                    <InputText @bind-Value="_form.LastName" placeholder="นามสกุล"/>
+                </div>
+                <div class="field">
+                    <label>เบอร์โทรศัพท์ <span class="req">*</span></label>
+                    <InputText @bind-Value="_form.Phone" placeholder="08X-XXX-XXXX"/>
+                </div>
+                <div class="field">
+                    <label>อีเมล</label>
+                    <InputText @bind-Value="_form.Email" placeholder="example@email.com"/>
+                </div>
+                <div class="field full">
+                    <label>ที่อยู่ปัจจุบัน</label>
+                    <InputTextArea @bind-Value="_form.Address" placeholder="บ้านเลขที่ ถนน ตำบล อำเภอ จังหวัด"/>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <div class="section-title">การศึกษาและประสบการณ์</div>
+            <div class="form-grid">
+                <div class="field">
+                    <label>ระดับการศึกษาสูงสุด <span class="req">*</span></label>
+                    <InputSelect @bind-Value="_form.EducationLevel">
+                        <option value="">-- เลือก --</option>
+                        <option value="HighSchool">ม.6 / ปวช.</option>
+                        <option value="HighVocational">ปวส. / อนุปริญญา</option>
+                        <option value="Bachelor">ปริญญาตรี</option>
+                        <option value="Master">ปริญญาโท</option>
+                    </InputSelect>
+                </div>
+                <div class="field">
+                    <label>สาขาวิชา</label>
+                    <InputText @bind-Value="_form.EducationField" placeholder="เช่น ไฟฟ้า, บัญชี"/>
+                </div>
+                <div class="field">
+                    <label>ประสบการณ์ทำงาน (ปี)</label>
+                    <InputNumber @bind-Value="_form.ExperienceYears"/>
+                </div>
+                <div class="field">
+                    <label>เงินเดือนที่คาดหวัง (บาท)</label>
+                    <InputNumber @bind-Value="_form.SalaryExpected"/>
+                </div>
+            </div>
+        </div>
+
+        @if (!string.IsNullOrEmpty(_error))
+        {
+            <div class="error-box">@_error</div>
+        }
+
+        <div class="submit-area">
+            <button type="submit" class="btn-submit" disabled="@_submitting">
+                @(_submitting ? "กำลังส่ง..." : "ส่งใบสมัคร →")
+            </button>
+        </div>
+    </EditForm>
+</div>
+
+@code {
+    [Parameter] public string JobId { get; set; } = "";
+
+    private JobPostingItem? _job;
+    private FormModel _form = new();
+    private bool _loading = true;
+    private bool _submitting;
+    private bool _submitted;
+    private string _refCode = "";
+    private string _error = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        try { _job = await Api.GetJobByIdAsync(JobId); }
+        finally { _loading = false; }
+    }
+
+    private async Task HandleSubmit()
+    {
+        _submitting = true;
+        _error = "";
+
+        try
+        {
+            var form = new ApplicationForm(
+                Guid.Parse(JobId),
+                _form.FirstName, _form.LastName,
+                _form.Phone, _form.Email,
+                null, _form.Address,
+                _form.EducationLevel, _form.EducationField,
+                _form.ExperienceYears, _form.SalaryExpected,
+                null, "Web");
+
+            var result = await Api.SubmitApplicationAsync(form);
+            if (result is not null)
+            {
+                _refCode = result.ReferenceCode;
+                _submitted = true;
+            }
+            else _error = "เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง";
+        }
+        catch { _error = "ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้"; }
+        finally { _submitting = false; }
+    }
+
+    private class FormModel
+    {
+        public string FirstName { get; set; } = "";
+        public string LastName { get; set; } = "";
+        public string Phone { get; set; } = "";
+        public string? Email { get; set; }
+        public string? Address { get; set; }
+        public string EducationLevel { get; set; } = "";
+        public string? EducationField { get; set; }
+        public int ExperienceYears { get; set; }
+        public decimal? SalaryExpected { get; set; }
+    }
+}

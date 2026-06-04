@@ -1,0 +1,85 @@
+@page "/track"
+@inject ApiService Api
+
+<PageTitle>ติดตามสถานะ — Janome Thailand</PageTitle>
+
+<div class="container track-page">
+    <h1>ติดตามสถานะใบสมัคร</h1>
+    <p class="subtitle">กรอกรหัสอ้างอิงที่ได้รับหลังสมัครงาน</p>
+
+    <div class="track-form">
+        <input @bind="_refCode"
+               @bind:event="oninput"
+               placeholder="เช่น JNM-A1234"
+               class="track-input"
+               @onkeydown="OnKeyDown"/>
+        <button class="btn-track" @onclick="Search" disabled="@_searching">
+            @(_searching ? "กำลังค้นหา..." : "ค้นหา")
+        </button>
+    </div>
+
+    @if (_notFound)
+    {
+        <div class="not-found">ไม่พบรหัส "@_refCode" กรุณาตรวจสอบอีกครั้ง</div>
+    }
+
+    @if (_result is not null)
+    {
+        <div class="track-result">
+            <div class="result-code">@_result.ReferenceCode</div>
+            <div class="result-job">@_result.JobPostingTitle</div>
+            <div class="result-status @GetStatusClass(_result.Status)">
+                @GetStatusText(_result.Status)
+            </div>
+            <div class="result-date">
+                สมัครเมื่อ @_result.CreatedAt.ToLocalTime().ToString("dd MMM yyyy HH:mm")
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private string _refCode = "";
+    private bool _searching;
+    private bool _notFound;
+    private TrackResult? _result;
+
+    private async Task OnKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter") await Search();
+    }
+
+    private async Task Search()
+    {
+        if (string.IsNullOrWhiteSpace(_refCode)) return;
+        _searching = true;
+        _notFound  = false;
+        _result    = null;
+
+        try
+        {
+            _result = await Api.TrackApplicationAsync(_refCode.Trim().ToUpper());
+            if (_result is null) _notFound = true;
+        }
+        catch { _notFound = true; }
+        finally { _searching = false; }
+    }
+
+    private string GetStatusText(string status) => status switch
+    {
+        "New"       => "รับใบสมัครแล้ว",
+        "Review"    => "กำลังพิจารณา",
+        "Interview" => "นัดสัมภาษณ์แล้ว",
+        "Pass"      => "ผ่านการพิจารณา",
+        "Fail"      => "ไม่ผ่านการพิจารณา",
+        _           => status
+    };
+
+    private string GetStatusClass(string status) => status switch
+    {
+        "Pass"   => "status-pass",
+        "Fail"   => "status-fail",
+        "Interview" => "status-interview",
+        _        => "status-default"
+    };
+}

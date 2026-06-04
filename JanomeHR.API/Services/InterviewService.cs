@@ -1,0 +1,122 @@
+using JanomeHR.API.Data;
+using JanomeHR.API.DTOs.Interview;
+using JanomeHR.API.Services.Interfaces;
+using JanomeHR.Shared.Entities;
+using JanomeHR.Shared.Enums;
+using Microsoft.EntityFrameworkCore;
+
+namespace JanomeHR.API.Services;
+
+public class InterviewService(AppDbContext db) : IInterviewService
+{
+    public async Task<List<InterviewResponseDto>> GetAllAsync(DateTime? date)
+    {
+        var query = db.Interviews
+            .Include(i => i.Application).ThenInclude(a => a.JobPosting)
+            .Include(i => i.Interviewer)
+            .AsQueryable();
+
+        if (date.HasValue)
+            query = query.Where(i => i.ScheduledAt.Date == date.Value.Date);
+
+        return await query
+            .OrderBy(i => i.ScheduledAt)
+            .Select(i => ToDto(i))
+            .ToListAsync();
+    }
+
+    public async Task<InterviewResponseDto?> GetByIdAsync(Guid id)
+    {
+        var i = await db.Interviews
+            .Include(i => i.Application).ThenInclude(a => a.JobPosting)
+            .Include(i => i.Interviewer)
+            .FirstOrDefaultAsync(i => i.Id == id);
+
+        return i is null ? null : ToDto(i);
+    }
+
+    public async Task<InterviewResponseDto> CreateAsync(CreateInterviewDto dto)
+    {
+        if (!Enum.TryParse<InterviewType>(dto.Type, out var type))
+            type = InterviewType.Onsite;
+
+        var interview = new Interview
+        {
+            ApplicationId  = dto.ApplicationId,
+            InterviewerId  = dto.InterviewerId,
+            ScheduledAt    = dto.ScheduledAt,
+            DurationMinutes = dto.DurationMinutes,
+            Type           = type,
+            Location       = dto.Location,
+            Status         = InterviewStatus.Scheduled,
+            Result         = InterviewResult.Pending,
+        };
+
+        db.Interviews.Add(interview);
+
+        // อัปเดตสถานะใบสมัครเป็น Interview
+        var app = await db.Applications.FindAsync(dto.ApplicationId);
+        if (app is not null)
+        {
+            app.Status    = ApplicationStatus.Interview;
+            app.UpdatedAt = DateTime.UtcNow;
+        }
+
+        await db.SaveChangesAsync();
+
+        await db.Entry(interview).Reference(i => i.Application)
+            .Query().Include(a => a.JobPosting).LoadAsync();
+        await db.Entry(interview).Reference(i => i.Interviewer).LoadAsync();
+
+        return ToDto(interview);
+    }
+
+    public async Task<bool> UpdateResultAsync(Guid id, UpdateInterviewResultDto dto)
+    {
+        var interview = await db.Interviews
+            .Include(i => i.Application)
+            .FirstOrDefaultAsync(i => i.Id == id);
+
+        if (interview is null) return false;
+
+        if (Enum.TryParse<InterviewResult>(dto.Result, out var result))
+        {
+            interview.Result = result;
+            interview.Status = InterviewStatus.Done;
+            interview.Notes  = dto.Notes;
+
+            // sync สถานะใบสมัคร
+            interview.Application.Status = result == InterviewResult.Pass
+                ? ApplicationStatus.Pass
+                : ApplicationStatus.Fail;
+            interview.Application.UpdatedAt = DateTime.UtcNow;
+        }
+
+        await db.SaveChangesAsync();
+        return true;
+    }
+
+    public async Task<bool> CancelAsync(Guid id)
+    {
+        var interview = await db.Interviews.FindAsync(id);
+        if (interview is null) return false;
+
+        interview.Status = InterviewStatus.Cancelled;
+        await db.SaveChangesAsync();
+        return true;
+    }
+
+    private static InterviewResponseDto ToDto(Interview i) => new(
+        i.Id,
+        $"{i.Application.FirstName} {i.Application.LastName}",
+        i.Application.JobPosting?.Title ?? "",
+        i.Interviewer?.FullName ?? "",
+        i.ScheduledAt,
+        i.DurationMinutes,
+        i.Type.ToString(),
+        i.Location,
+        i.Status.ToString(),
+        i.Result.ToString(),
+        i.CreatedAt
+    );
+}

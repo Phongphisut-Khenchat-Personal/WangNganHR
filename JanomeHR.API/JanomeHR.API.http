@@ -1,0 +1,6 @@
+@JanomeHR.API_HostAddress = http://localhost:5083
+
+GET {{JanomeHR.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

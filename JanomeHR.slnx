@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="JanomeHR.API/JanomeHR.API.csproj" />
+  <Project Path="JanomeHR.Desktop/JanomeHR.Desktop.csproj" />
+  <Project Path="JanomeHR.Shared/JanomeHR.Shared.csproj" />
+  <Project Path="JanomeHR.Web/JanomeHR.Web.csproj" />
+</Solution>

@@ -22,8 +22,8 @@ public class JobPostingsController(IJobPostingService jobService) : ControllerBa
         return result is null ? NotFound() : Ok(result);
     }
 
-    // HR Only
-    [Authorize(Roles = "HR,Admin")]
+    // HR / Admin / Manager — ดูรายการ (Manager อ่านอย่างเดียว)
+    [Authorize(Roles = "HR,Admin,Manager")]
     [HttpGet]
     public async Task<IActionResult> GetAll()
         => Ok(await jobService.GetAllAsync());

@@ -26,6 +26,9 @@ public partial class JobPostingsPage : Page
         if (IsLoaded) Dispatcher.Invoke(RefreshLocalizedUi);
     }
 
+    private bool CanManageJobs =>
+        _api.CurrentRole is "HR" or "Admin";
+
     private async Task LoadAsync()
     {
         try
@@ -39,8 +42,11 @@ public partial class JobPostingsPage : Page
         }
     }
 
-    private void RefreshLocalizedUi() =>
-        LstJobs.ItemsSource = _items.Select(j => new JobRow(j)).ToList();
+    private void RefreshLocalizedUi()
+    {
+        BtnCreate.Visibility = CanManageJobs ? Visibility.Visible : Visibility.Collapsed;
+        LstJobs.ItemsSource = _items.Select(j => new JobRow(j, CanManageJobs)).ToList();
+    }
 
     private async void BtnRefresh_Click(object s, RoutedEventArgs e)
         => await LoadAsync();
@@ -119,7 +125,7 @@ public class JobRow
     public Visibility CloseVisible  { get; }
     public Visibility QrVisible     { get; }
 
-    public JobRow(JobPostingItem j)
+    public JobRow(JobPostingItem j, bool canManage = true)
     {
         Id             = j.Id;
         Title          = j.Title;
@@ -150,9 +156,9 @@ public class JobRow
                 new SolidColorBrush(Colors.Black))
         };
 
-        PublishVisible = j.Status == "Draft"  ? Visibility.Visible : Visibility.Collapsed;
-        EditVisible    = j.Status is "Draft" or "Active" ? Visibility.Visible : Visibility.Collapsed;
-        CloseVisible   = j.Status == "Active" ? Visibility.Visible : Visibility.Collapsed;
-        QrVisible      = j.Status == "Active" ? Visibility.Visible : Visibility.Collapsed;
+        PublishVisible = canManage && j.Status == "Draft"  ? Visibility.Visible : Visibility.Collapsed;
+        EditVisible    = canManage && j.Status is "Draft" or "Active" ? Visibility.Visible : Visibility.Collapsed;
+        CloseVisible   = canManage && j.Status == "Active" ? Visibility.Visible : Visibility.Collapsed;
+        QrVisible      = canManage && j.Status == "Active" ? Visibility.Visible : Visibility.Collapsed;
     }
 }

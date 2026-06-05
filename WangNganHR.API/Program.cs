@@ -84,7 +84,8 @@ app.UseSwaggerUI();
 app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseHttpsRedirection();
+if (!app.Environment.IsDevelopment())
+    app.UseHttpsRedirection();
 
 var uploadsPath = Path.Combine(app.Environment.ContentRootPath, "uploads");
 Directory.CreateDirectory(uploadsPath);
@@ -96,10 +97,12 @@ app.UseStaticFiles(new StaticFileOptions
 
 app.MapControllers();
 
-// Idempotent repair if StructuredJobPosting migration was recorded without DDL
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    await db.Database.MigrateAsync();
+
+    // Idempotent repair if StructuredJobPosting migration was recorded without DDL
     await db.Database.ExecuteSqlRawAsync("""
         ALTER TABLE "JobPostings" ADD COLUMN IF NOT EXISTS "Benefits" text NOT NULL DEFAULT '[]';
         ALTER TABLE "JobPostings" ADD COLUMN IF NOT EXISTS "Qualifications" text NOT NULL DEFAULT '[]';
@@ -109,6 +112,9 @@ using (var scope = app.Services.CreateScope())
         ALTER TABLE "Applications" ADD COLUMN IF NOT EXISTS "ReferralSource" character varying(100);
         ALTER TABLE "Applications" ADD COLUMN IF NOT EXISTS "PdpaConsentedAt" timestamp without time zone;
         """);
+
+    await DbSeeder.SeedAsync(db);
+    await DbSeeder.RepairAsync(db);
 }
 
 app.Run();

@@ -10,7 +10,7 @@ namespace WangNganHR.Desktop.Views;
 
 public partial class ApplicationDetailWindow : Window
 {
-    private const string ApiBase = "http://localhost:5083";
+    private static string ApiBase => ApiSettings.BaseUrl;
 
     private readonly ApplicationDetail _detail;
     private readonly ApiService _api;

@@ -1,11 +1,8 @@
 using WangNganHR.Desktop.Localization;
-
 using WangNganHR.Desktop.Services;
-
 using WangNganHR.Desktop.Views.Pages;
-
+using Microsoft.Extensions.DependencyInjection;
 using System.Windows;
-
 using System.Windows.Controls;
 
 
@@ -53,8 +50,17 @@ public partial class MainWindow : Window
 
 
     private void BtnSettings_Click(object sender, RoutedEventArgs e) =>
-
         LanguageMenuHelper.Open(BtnSettings, LanguageMenu);
+
+    private void BtnLogout_Click(object sender, RoutedEventArgs e)
+    {
+        _api.Logout();
+        LocalizationService.Instance.LanguageChanged -= OnLanguageChanged;
+
+        var login = App.Services.GetRequiredService<LoginWindow>();
+        login.Show();
+        Close();
+    }
 
 
 

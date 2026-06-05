@@ -10,14 +10,22 @@ namespace WangNganHR.Desktop.Services;
 public class ApiService
 {
     private readonly HttpClient _http;
-    private const string Base = "http://localhost:5083";
+    private readonly string _base = ApiSettings.BaseUrl;
     public string? CurrentUserName { get; private set; }
     public string? CurrentRole { get; private set; }
     public Guid? CurrentUserId { get; private set; }
 
     public ApiService()
     {
-        _http = new HttpClient();
+        _http = new HttpClient { Timeout = TimeSpan.FromSeconds(10) };
+    }
+
+    public void Logout()
+    {
+        _http.DefaultRequestHeaders.Authorization = null;
+        CurrentUserName = null;
+        CurrentRole = null;
+        CurrentUserId = null;
     }
 
     public void SetToken(string token)
@@ -48,7 +56,7 @@ public class ApiService
     // ── Auth ─────────────────────────────────────
     public async Task<LoginResponse?> LoginAsync(string username, string password)
     {
-        var res = await _http.PostAsJsonAsync($"{Base}/api/Auth/login",
+        var res = await _http.PostAsJsonAsync($"{_base}/api/Auth/login",
             new LoginRequest(username, password));
         if (!res.IsSuccessStatusCode) return null;
         return await res.Content.ReadFromJsonAsync<LoginResponse>();
@@ -58,46 +66,46 @@ public class ApiService
     public async Task<List<JobPostingItem>> GetJobPostingsAsync()
     {
         var result = await _http.GetFromJsonAsync<List<JobPostingItem>>(
-            $"{Base}/api/JobPostings");
+            $"{_base}/api/JobPostings");
         return result ?? [];
     }
 
     public async Task<JobPostingItem?> GetJobPostingAsync(Guid id) =>
-        await _http.GetFromJsonAsync<JobPostingItem>($"{Base}/api/JobPostings/{id}");
+        await _http.GetFromJsonAsync<JobPostingItem>($"{_base}/api/JobPostings/{id}");
 
     public async Task<JobPostingItem?> CreateJobPostingAsync(
         CreateJobPostingRequest req)
     {
         var res = await _http.PostAsJsonAsync(
-            $"{Base}/api/JobPostings", req);
+            $"{_base}/api/JobPostings", req);
         if (!res.IsSuccessStatusCode) return null;
         return await res.Content.ReadFromJsonAsync<JobPostingItem>();
     }
 
     public async Task<bool> UpdateJobPostingAsync(Guid id, UpdateJobPostingRequest req)
     {
-        var res = await _http.PutAsJsonAsync($"{Base}/api/JobPostings/{id}", req);
+        var res = await _http.PutAsJsonAsync($"{_base}/api/JobPostings/{id}", req);
         return res.IsSuccessStatusCode;
     }
 
     public async Task<bool> PublishJobPostingAsync(Guid id)
     {
         var res = await _http.PostAsync(
-            $"{Base}/api/JobPostings/{id}/publish", null);
+            $"{_base}/api/JobPostings/{id}/publish", null);
         return res.IsSuccessStatusCode;
     }
 
     public async Task<bool> CloseJobPostingAsync(Guid id)
     {
         var res = await _http.PostAsync(
-            $"{Base}/api/JobPostings/{id}/close", null);
+            $"{_base}/api/JobPostings/{id}/close", null);
         return res.IsSuccessStatusCode;
     }
 
     public async Task<string?> GenerateQrCodeAsync(Guid id)
     {
         var res = await _http.PostAsync(
-            $"{Base}/api/JobPostings/{id}/qrcode", null);
+            $"{_base}/api/JobPostings/{id}/qrcode", null);
         if (!res.IsSuccessStatusCode) return null;
         var data = await res.Content.ReadFromJsonAsync<Dictionary<string, string>>();
         return data?.GetValueOrDefault("qrCode");
@@ -107,7 +115,7 @@ public class ApiService
     public async Task<List<ApplicationItem>> GetApplicationsAsync(
         string? status = null, Guid? jobPostingId = null)
     {
-        var url = $"{Base}/api/Applications";
+        var url = $"{_base}/api/Applications";
         var qs  = new List<string>();
         if (!string.IsNullOrEmpty(status)) qs.Add($"status={status}");
         if (jobPostingId.HasValue) qs.Add($"jobPostingId={jobPostingId}");
@@ -120,14 +128,14 @@ public class ApiService
     public async Task<ApplicationDetail?> GetApplicationDetailAsync(Guid id)
     {
         return await _http.GetFromJsonAsync<ApplicationDetail>(
-            $"{Base}/api/Applications/{id}");
+            $"{_base}/api/Applications/{id}");
     }
 
     public async Task<bool> UpdateApplicationStatusAsync(
         Guid id, string status, string? note = null, int? rating = null)
     {
         var res = await _http.PatchAsJsonAsync(
-            $"{Base}/api/Applications/{id}/status",
+            $"{_base}/api/Applications/{id}/status",
             new UpdateStatusRequest(status, note, rating));
         return res.IsSuccessStatusCode;
     }
@@ -135,7 +143,7 @@ public class ApiService
     // ── Interviews ────────────────────────────────
     public async Task<List<InterviewItem>> GetInterviewsAsync(DateTime? date = null)
     {
-        var url = $"{Base}/api/Interviews";
+        var url = $"{_base}/api/Interviews";
         if (date.HasValue)
             url += $"?date={date.Value:yyyy-MM-dd}";
         var result = await _http.GetFromJsonAsync<List<InterviewItem>>(url);
@@ -146,7 +154,7 @@ public class ApiService
         CreateInterviewRequest req)
     {
         var res = await _http.PostAsJsonAsync(
-            $"{Base}/api/Interviews", req);
+            $"{_base}/api/Interviews", req);
         if (!res.IsSuccessStatusCode) return null;
         return await res.Content.ReadFromJsonAsync<InterviewItem>();
     }

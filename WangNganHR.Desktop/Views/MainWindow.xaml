@@ -61,31 +61,32 @@
                 <StackPanel DockPanel.Dock="Bottom" Margin="0,0,0,20">
 
                     <Button x:Name="BtnSettings"
-
                             Style="{StaticResource NavButton}"
-
                             Click="BtnSettings_Click">
 
                         <controls:FaButtonContent Icon="gear"
-
                             Label="{DynamicResource Btn_Settings}"
-
                             IconBrush="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
 
                         <Button.ContextMenu>
-
                             <ContextMenu x:Name="LanguageMenu"/>
-
                         </Button.ContextMenu>
 
                     </Button>
 
+                    <Button x:Name="BtnLogout"
+                            Style="{StaticResource NavButton}"
+                            Click="BtnLogout_Click">
+
+                        <controls:FaButtonContent Icon="sign-out"
+                            Label="{DynamicResource Btn_Logout}"
+                            IconBrush="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+
+                    </Button>
+
                     <TextBlock Text="{DynamicResource Footer_Version}"
-
                                Foreground="#666666"
-
                                Margin="20,14,20,0"
-
                                TextWrapping="Wrap"/>
 
                 </StackPanel>

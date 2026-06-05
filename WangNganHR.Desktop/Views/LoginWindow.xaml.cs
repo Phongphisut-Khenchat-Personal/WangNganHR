@@ -59,7 +59,7 @@ public partial class LoginWindow : Window
         }
         catch
         {
-            ShowError(Loc.T("Login_ErrorApi"));
+            ShowError(Loc.F("Login_ErrorApi", ApiSettings.BaseUrl));
         }
         finally
         {

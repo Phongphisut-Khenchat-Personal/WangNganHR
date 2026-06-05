@@ -14,7 +14,13 @@ if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 & "$PSScriptRoot\sign-desktop.ps1" -OutputDir $outDir
 
 Write-Host 'Starting WangNganHR.Desktop...' -ForegroundColor Green
-$proc = Start-Process -FilePath $exe -PassThru
+try {
+    $proc = Start-Process -FilePath $exe -PassThru
+} catch {
+    Write-Host $_.Exception.Message -ForegroundColor Red
+    Write-Host 'WDAC blocked launch. Re-run this script (sign-assemblies trusts the local dev cert), or ask IT to allow this project folder.' -ForegroundColor Yellow
+    exit 1
+}
 
 if ($proc.HasExited -and $proc.ExitCode -ne 0) {
     Write-Host "WangNganHR.Desktop exited immediately (code $($proc.ExitCode))." -ForegroundColor Red

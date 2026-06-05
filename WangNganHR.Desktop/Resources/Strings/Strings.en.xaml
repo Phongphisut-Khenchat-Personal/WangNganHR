@@ -6,6 +6,7 @@
     <sys:String x:Key="Lang_Japanese">日本語</sys:String>
     <sys:String x:Key="Lang_Label">Language</sys:String>
     <sys:String x:Key="Btn_Settings">Settings</sys:String>
+    <sys:String x:Key="Btn_Logout">Sign out</sys:String>
 
     <sys:String x:Key="Brand_Mark">WANG NGAN</sys:String>
     <sys:String x:Key="Brand_HR">HR Dashboard</sys:String>
@@ -30,7 +31,7 @@
     <sys:String x:Key="Login_Button">Sign in</sys:String>
     <sys:String x:Key="Login_ErrorEmpty">Please enter username and password</sys:String>
     <sys:String x:Key="Login_ErrorFailed">Invalid username or password</sys:String>
-    <sys:String x:Key="Login_ErrorApi">Cannot connect to API (ensure the API is running on port 5083)</sys:String>
+    <sys:String x:Key="Login_ErrorApi">Cannot connect to API at {0}</sys:String>
 
     <sys:String x:Key="Window_Dashboard">Wang Ngan HR Dashboard</sys:String>
     <sys:String x:Key="Nav_Applications">Applications</sys:String>

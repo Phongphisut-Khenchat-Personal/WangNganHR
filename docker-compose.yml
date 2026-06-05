@@ -1,6 +1,7 @@
 services:
   postgres:
     image: postgres:16-alpine
+    # ชื่อ container เดิม (janomehr_db) — ใช้ connect-db.ps1 เข้า DB
     container_name: janomehr_db
     restart: unless-stopped
     environment:

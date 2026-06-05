@@ -6,6 +6,7 @@
     <sys:String x:Key="Lang_Japanese">日本語</sys:String>
     <sys:String x:Key="Lang_Label">言語</sys:String>
     <sys:String x:Key="Btn_Settings">設定</sys:String>
+    <sys:String x:Key="Btn_Logout">ログアウト</sys:String>
 
     <sys:String x:Key="Brand_Mark">WANG NGAN</sys:String>
     <sys:String x:Key="Brand_HR">HRダッシュボード</sys:String>
@@ -30,7 +31,7 @@
     <sys:String x:Key="Login_Button">ログイン</sys:String>
     <sys:String x:Key="Login_ErrorEmpty">ユーザー名とパスワードを入力してください</sys:String>
     <sys:String x:Key="Login_ErrorFailed">ユーザー名またはパスワードが正しくありません</sys:String>
-    <sys:String x:Key="Login_ErrorApi">APIに接続できません（APIがポート5083で起動しているか確認）</sys:String>
+    <sys:String x:Key="Login_ErrorApi">APIに接続できません（{0}）</sys:String>
 
     <sys:String x:Key="Window_Dashboard">Wang Ngan HRダッシュボード</sys:String>
     <sys:String x:Key="Nav_Applications">応募一覧</sys:String>

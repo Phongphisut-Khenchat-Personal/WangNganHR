@@ -22,6 +22,16 @@ if (-not $cert) {
     Write-Host 'Created local code-signing certificate: WangNganHR Local Dev' -ForegroundColor Yellow
 }
 
+foreach ($storeName in @('Root', 'TrustedPublisher')) {
+    $store = New-Object System.Security.Cryptography.X509Certificates.X509Store($storeName, 'CurrentUser')
+    $store.Open('ReadWrite')
+    if ($store.Certificates.Find('FindByThumbprint', $cert.Thumbprint, $false).Count -eq 0) {
+        $store.Add($cert)
+        Write-Host "Trusted cert in CurrentUser\$storeName" -ForegroundColor DarkGray
+    }
+    $store.Close()
+}
+
 $signed = 0
 foreach ($path in @(
     Get-ChildItem -Path $OutputDir -Filter 'WangNganHR*.dll' -File -ErrorAction SilentlyContinue

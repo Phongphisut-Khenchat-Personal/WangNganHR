@@ -47,6 +47,7 @@ public partial class FaIcon : UserControl
         "print" => PackIconFontAwesomeKind.PrintSolid,
         "save" => PackIconFontAwesomeKind.FloppyDiskSolid,
         "sign-in" => PackIconFontAwesomeKind.RightToBracketSolid,
+        "sign-out" => PackIconFontAwesomeKind.RightFromBracketSolid,
         "search" => PackIconFontAwesomeKind.MagnifyingGlassSolid,
         "chevron-left" => PackIconFontAwesomeKind.ChevronLeftSolid,
         "chevron-right" => PackIconFontAwesomeKind.ChevronRightSolid,

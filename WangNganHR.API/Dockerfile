@@ -10,9 +10,9 @@ COPY ["WangNganHR.Shared/WangNganHR.Shared.csproj", "WangNganHR.Shared/"]
 RUN dotnet restore "WangNganHR.API/WangNganHR.API.csproj"
 COPY . .
 WORKDIR "/src/WangNganHR.API"
-RUN dotnet publish "WangNganHR.API.csproj" -c Release -o /app/publish --no-restore
+RUN dotnet publish "WangNganHR.API.csproj" -c Release -o /app/out
 
 FROM base AS final
 WORKDIR /app
-COPY --from=publish /app/publish .
+COPY --from=build /app/out .
 ENTRYPOINT ["dotnet", "WangNganHR.API.dll"]

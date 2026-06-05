@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("JanomeHR.Shared")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+05c6d17a51f4b3be7e40f26e178b2ba84cc30d9b")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+710a3227f99b723d478c78464839eab055525f58")]
 [assembly: System.Reflection.AssemblyProductAttribute("JanomeHR.Shared")]
 [assembly: System.Reflection.AssemblyTitleAttribute("JanomeHR.Shared")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

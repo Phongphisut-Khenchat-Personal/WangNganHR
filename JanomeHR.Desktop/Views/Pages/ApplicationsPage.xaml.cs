@@ -1,3 +1,4 @@
+using JanomeHR.Desktop.Localization;
 using JanomeHR.Desktop.Models;
 using JanomeHR.Desktop.Services;
 using System.Collections.ObjectModel;
@@ -11,30 +12,108 @@ namespace JanomeHR.Desktop.Views.Pages;
 public partial class ApplicationsPage : Page
 {
     private readonly ApiService _api;
+    private List<ApplicationItem> _items = [];
     private List<ApplicationRow> _allRows = [];
+    private bool _filterComboReady;
 
     public ApplicationsPage(ApiService api)
     {
         InitializeComponent();
         _api = api;
-        CmbStatus.SelectedIndex = 0;
         Loaded += async (_, _) => await LoadAsync();
+        LocalizationService.Instance.LanguageChanged += OnLanguageChanged;
+    }
+
+    private void OnLanguageChanged()
+    {
+        if (IsLoaded) Dispatcher.Invoke(RefreshLocalizedUi);
     }
 
     private async Task LoadAsync()
     {
         try
         {
-            var items = await _api.GetApplicationsAsync();
-            _allRows  = items.Select(a => new ApplicationRow(a)).ToList();
-
+            _items = await _api.GetApplicationsAsync();
+            RebuildRows();
+            InitFilterCombos();
+            UpdateGridHeaders();
             UpdateStats();
             ApplyFilter();
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"โหลดข้อมูลไม่ได้: {ex.Message}");
+            MessageBox.Show(Loc.F("Msg_LoadFailed", ex.Message));
         }
+    }
+
+    private void RebuildRows() =>
+        _allRows = _items.Select(a => new ApplicationRow(a)).ToList();
+
+    private void RefreshLocalizedUi()
+    {
+        RebuildRows();
+        InitFilterCombos();
+        UpdateGridHeaders();
+        UpdateStats();
+        ApplyFilter();
+    }
+
+    private void InitFilterCombos()
+    {
+        var statusSel = (CmbStatus.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "";
+        var jobSel = (CmbJob.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "";
+        var dateSel = (CmbDate.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "";
+
+        _filterComboReady = false;
+
+        CmbJob.Items.Clear();
+        CmbJob.Items.Add(new ComboBoxItem { Content = Loc.T("Filter_AllJobs"), Tag = "" });
+        foreach (var title in _items.Select(a => a.JobPostingTitle).Distinct().OrderBy(t => t))
+            CmbJob.Items.Add(new ComboBoxItem { Content = title, Tag = title });
+
+        CmbStatus.Items.Clear();
+        CmbStatus.Items.Add(new ComboBoxItem { Content = Loc.T("Filter_AllStatus"), Tag = "" });
+        CmbStatus.Items.Add(new ComboBoxItem { Content = Loc.T("Status_New"), Tag = "New" });
+        CmbStatus.Items.Add(new ComboBoxItem { Content = Loc.T("Status_Review"), Tag = "Review" });
+        CmbStatus.Items.Add(new ComboBoxItem { Content = Loc.T("Status_Interview"), Tag = "Interview" });
+        CmbStatus.Items.Add(new ComboBoxItem { Content = Loc.T("Status_Pass"), Tag = "Pass" });
+        CmbStatus.Items.Add(new ComboBoxItem { Content = Loc.T("Status_Fail"), Tag = "Fail" });
+
+        CmbDate.Items.Clear();
+        CmbDate.Items.Add(new ComboBoxItem { Content = Loc.T("Filter_AllDates"), Tag = "" });
+        CmbDate.Items.Add(new ComboBoxItem { Content = Loc.T("Filter_Today"), Tag = "0" });
+        CmbDate.Items.Add(new ComboBoxItem { Content = Loc.T("Filter_7Days"), Tag = "7" });
+        CmbDate.Items.Add(new ComboBoxItem { Content = Loc.T("Filter_30Days"), Tag = "30" });
+
+        SelectComboTag(CmbJob, jobSel);
+        SelectComboTag(CmbStatus, statusSel);
+        SelectComboTag(CmbDate, dateSel);
+
+        _filterComboReady = true;
+    }
+
+    private static void SelectComboTag(ComboBox combo, string tag)
+    {
+        for (var i = 0; i < combo.Items.Count; i++)
+        {
+            if (combo.Items[i] is ComboBoxItem item && (item.Tag?.ToString() ?? "") == tag)
+            {
+                combo.SelectedIndex = i;
+                return;
+            }
+        }
+        combo.SelectedIndex = 0;
+    }
+
+    private void UpdateGridHeaders()
+    {
+        ColReference.Header = Loc.T("Col_Reference");
+        ColFullName.Header = Loc.T("Col_FullName");
+        ColJob.Header = Loc.T("Col_Job");
+        ColPhone.Header = Loc.T("Col_Phone");
+        ColSource.Header = Loc.T("Col_Source");
+        ColStatus.Header = Loc.T("Col_Status");
+        ColCreatedAt.Header = Loc.T("Col_CreatedAt");
     }
 
     private void UpdateStats()
@@ -49,6 +128,15 @@ public partial class ApplicationsPage : Page
     {
         var search = TxtSearch.Text.ToLower();
         var status = (CmbStatus.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "";
+        var job = (CmbJob.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "";
+        var dateTag = (CmbDate.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "";
+        DateTime? since = dateTag switch
+        {
+            "0" => DateTime.Today,
+            "7" => DateTime.Today.AddDays(-7),
+            "30" => DateTime.Today.AddDays(-30),
+            _ => null
+        };
 
         var filtered = _allRows
             .Where(r => string.IsNullOrEmpty(search) ||
@@ -56,20 +144,23 @@ public partial class ApplicationsPage : Page
                         r.ReferenceCode.ToLower().Contains(search) ||
                         r.Phone.Contains(search))
             .Where(r => string.IsNullOrEmpty(status) || r.Status == status)
+            .Where(r => string.IsNullOrEmpty(job) || r.JobPostingTitle == job)
+            .Where(r => since is null || r.CreatedAt >= since.Value)
             .ToList();
 
         DgApplications.ItemsSource = filtered;
-        TxtCount.Text = $"แสดง {filtered.Count} รายการ จากทั้งหมด {_allRows.Count} รายการ";
+        TxtCount.Text = Loc.F("Count_Format", filtered.Count, _allRows.Count);
     }
 
-    private void TxtSearch_TextChanged(object s, TextChangedEventArgs e)
-        => ApplyFilter();
+    private void TxtSearch_TextChanged(object s, TextChangedEventArgs e) => ApplyFilter();
 
-    private void CmbStatus_SelectionChanged(object s, SelectionChangedEventArgs e)
-        => ApplyFilter();
+    private void CmbFilter_Changed(object s, SelectionChangedEventArgs e)
+    {
+        if (_filterComboReady)
+            ApplyFilter();
+    }
 
-    private async void BtnRefresh_Click(object s, RoutedEventArgs e)
-        => await LoadAsync();
+    private async void BtnRefresh_Click(object s, RoutedEventArgs e) => await LoadAsync();
 
     private async void DgApplications_DoubleClick(object s, MouseButtonEventArgs e)
     {
@@ -87,25 +178,26 @@ public partial class ApplicationsPage : Page
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"เกิดข้อผิดพลาด: {ex.Message}");
+            MessageBox.Show(Loc.F("Msg_Error", ex.Message));
         }
     }
 }
 
-// ── View Model Row ────────────────────────────────
 public class ApplicationRow
 {
-    public Guid   Id             { get; }
-    public string ReferenceCode  { get; }
-    public string FullName       { get; }
-    public string JobPostingTitle{ get; }
-    public string Phone          { get; }
-    public string Status         { get; }
-    public string SourceText     { get; }
-    public string CreatedAtText  { get; }
-    public string StatusText     { get; }
-    public Brush  StatusColor    { get; }
-    public Brush  StatusTextColor{ get; }
+    public Guid   Id              { get; }
+    public string ReferenceCode   { get; }
+    public string FullName        { get; }
+    public string JobPostingTitle { get; }
+    public string Phone           { get; }
+    public string Status          { get; }
+    public string SourceText      { get; }
+    public string CreatedAtDate   { get; }
+    public string CreatedAtTime   { get; }
+    public DateTime CreatedAt     { get; }
+    public string StatusText      { get; }
+    public Brush  StatusColor     { get; }
+    public Brush  StatusTextColor { get; }
 
     public ApplicationRow(ApplicationItem a)
     {
@@ -115,32 +207,29 @@ public class ApplicationRow
         JobPostingTitle = a.JobPostingTitle;
         Phone           = a.Phone;
         Status          = a.Status;
-        CreatedAtText   = a.CreatedAt.ToLocalTime().ToString("dd/MM/yy HH:mm");
-        SourceText      = a.Source switch
-        {
-            "QRCode"  => "QR Code",
-            "WalkIn"  => "เดินมาเอง",
-            "Web"     => "Web",
-            _         => a.Source
-        };
+        var localCreated = a.CreatedAt.ToLocalTime();
+        CreatedAt       = localCreated.Date;
+        CreatedAtDate   = localCreated.ToString("dd/MM/yy");
+        CreatedAtTime   = localCreated.ToString("HH:mm");
+        SourceText      = StatusLocalizer.ApplicationSource(a.Source);
         (StatusText, StatusColor, StatusTextColor) = a.Status switch
         {
-            "New"       => ("ใหม่",
+            "New" => (StatusLocalizer.ApplicationStatus("New"),
                 new SolidColorBrush(Color.FromRgb(252,232,236)),
                 new SolidColorBrush(Color.FromRgb(158,11,35))),
-            "Review"    => ("กำลังพิจารณา",
+            "Review" => (StatusLocalizer.ApplicationStatus("Review"),
                 new SolidColorBrush(Color.FromRgb(254,243,199)),
                 new SolidColorBrush(Color.FromRgb(180,83,9))),
-            "Interview" => ("นัดสัมภาษณ์",
+            "Interview" => (StatusLocalizer.ApplicationStatus("Interview"),
                 new SolidColorBrush(Color.FromRgb(219,234,254)),
                 new SolidColorBrush(Color.FromRgb(29,78,216))),
-            "Pass"      => ("ผ่าน",
+            "Pass" => (StatusLocalizer.ApplicationStatus("Pass"),
                 new SolidColorBrush(Color.FromRgb(230,244,236)),
                 new SolidColorBrush(Color.FromRgb(26,122,74))),
-            "Fail"      => ("ไม่ผ่าน",
+            "Fail" => (StatusLocalizer.ApplicationStatus("Fail"),
                 new SolidColorBrush(Color.FromRgb(244,244,242)),
                 new SolidColorBrush(Color.FromRgb(107,107,107))),
-            _ => (a.Status,
+            _ => (StatusLocalizer.ApplicationStatus(a.Status),
                 new SolidColorBrush(Colors.LightGray),
                 new SolidColorBrush(Colors.Black))
         };

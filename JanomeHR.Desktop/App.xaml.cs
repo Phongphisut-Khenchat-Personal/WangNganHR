@@ -1,4 +1,5 @@
-﻿using JanomeHR.Desktop.Services;
+﻿using JanomeHR.Desktop.Localization;
+using JanomeHR.Desktop.Services;
 using JanomeHR.Desktop.Views;
 using Microsoft.Extensions.DependencyInjection;
 using System.Windows;
@@ -12,6 +13,12 @@ public partial class App : Application
     protected override void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
+        DispatcherUnhandledException += (_, args) =>
+        {
+            MessageBox.Show(args.Exception.Message, "Janome HR", MessageBoxButton.OK, MessageBoxImage.Error);
+            args.Handled = true;
+        };
+        LocalizationService.Instance.Initialize("en");
 
         var collection = new ServiceCollection();
         collection.AddSingleton<ApiService>();

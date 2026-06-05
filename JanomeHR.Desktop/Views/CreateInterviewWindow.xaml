@@ -1,0 +1,184 @@
+<Window x:Class="JanomeHR.Desktop.Views.CreateInterviewWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:JanomeHR.Desktop.Controls"
+        Title="{DynamicResource CreateInterview_Title}"
+        Height="520" Width="520"
+        WindowStartupLocation="CenterOwner"
+        Background="#F4F4F2" ResizeMode="NoResize"
+        FontFamily="{StaticResource AppFont}"
+        FontSize="{StaticResource FontSizeMin}">
+
+    <Grid>
+
+        <Grid.RowDefinitions>
+
+            <RowDefinition Height="Auto"/>
+
+            <RowDefinition Height="*"/>
+
+            <RowDefinition Height="Auto"/>
+
+        </Grid.RowDefinitions>
+
+
+
+        <Border Grid.Row="0" Background="#1A1A1A" Padding="24,16">
+
+            <StackPanel Orientation="Horizontal">
+
+                <controls:FaIcon Icon="calendar-check" IconBrush="White" Width="22" Height="22" Margin="0,0,12,0"/>
+
+                <StackPanel>
+
+                    <TextBlock Text="{DynamicResource CreateInterview_Title}" Foreground="White"
+
+                               FontSize="{StaticResource FontSizeHeading}" FontWeight="SemiBold"/>
+
+                    <TextBlock x:Name="TxtApplicantName"
+
+                               Foreground="#AAAAAA" Margin="0,4,0,0"/>
+
+                </StackPanel>
+
+            </StackPanel>
+
+        </Border>
+
+
+
+        <ScrollViewer Grid.Row="1" Padding="24,16">
+
+            <StackPanel>
+
+                <TextBlock Text="{DynamicResource CreateInterview_Date}"
+
+                           Style="{StaticResource LabelCaption}" Margin="0,0,0,6"/>
+
+                <DatePicker x:Name="DpDate"
+
+                            BorderBrush="#E0DEDD" Background="White"
+
+                            Margin="0,0,0,14"/>
+
+
+
+                <TextBlock Text="{DynamicResource CreateInterview_Time}"
+
+                           Style="{StaticResource LabelCaption}" Margin="0,0,0,6"/>
+
+                <Grid Margin="0,0,0,14">
+
+                    <Grid.ColumnDefinitions>
+
+                        <ColumnDefinition Width="*"/>
+
+                        <ColumnDefinition Width="Auto"/>
+
+                        <ColumnDefinition Width="*"/>
+
+                    </Grid.ColumnDefinitions>
+
+                    <ComboBox x:Name="CmbHour" Grid.Column="0"/>
+
+                    <TextBlock Grid.Column="1" Text=":"
+
+                               FontSize="{StaticResource FontSizeHeading}" FontWeight="Bold"
+
+                               VerticalAlignment="Center" Margin="8,0"/>
+
+                    <ComboBox x:Name="CmbMinute" Grid.Column="2"/>
+
+                </Grid>
+
+
+
+                <TextBlock Text="{DynamicResource CreateInterview_Duration}"
+
+                           Style="{StaticResource LabelCaption}" Margin="0,0,0,6"/>
+
+                <ComboBox x:Name="CmbDuration" Margin="0,0,0,14"/>
+
+
+
+                <TextBlock Text="{DynamicResource CreateInterview_Type}"
+
+                           Style="{StaticResource LabelCaption}" Margin="0,0,0,6"/>
+
+                <ComboBox x:Name="CmbType"
+
+                          Margin="0,0,0,14"
+
+                          SelectionChanged="CmbType_SelectionChanged"/>
+
+
+
+                <TextBlock x:Name="LblLocation"
+
+                           Text="{DynamicResource Detail_Location}"
+
+                           Style="{StaticResource LabelCaption}" Margin="0,0,0,6"/>
+
+                <TextBox x:Name="TxtLocation"
+
+                         Margin="0,0,0,14"
+
+                         controls:PlaceholderProperties.Text="{DynamicResource Placeholder_Location}"/>
+
+
+
+                <TextBlock Text="Error" x:Name="TxtError"
+
+                           Foreground="#C8102E" Visibility="Collapsed"/>
+
+            </StackPanel>
+
+        </ScrollViewer>
+
+
+
+        <Border Grid.Row="2" Background="White"
+
+                BorderBrush="#E0DEDD" BorderThickness="0,1,0,0"
+
+                Padding="24,12">
+
+            <DockPanel>
+
+                <Button DockPanel.Dock="Right"
+
+                        Margin="8,0,0,0"
+
+                        Background="#F4F4F2" Foreground="#1A1A1A"
+
+                        BorderBrush="#E0DEDD" BorderThickness="1"
+
+                        Cursor="Hand" Click="BtnCancel_Click">
+
+                    <controls:FaButtonContent Icon="xmark" Label="{DynamicResource Btn_Cancel}"
+
+                        IconBrush="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+
+                </Button>
+
+                <Button DockPanel.Dock="Right"
+
+                        Style="{StaticResource PrimaryButton}"
+
+                        Background="#1D4ED8"
+
+                        Click="BtnSave_Click">
+
+                    <controls:FaButtonContent Icon="calendar-check" Label="{DynamicResource Btn_ConfirmInterview}"
+
+                        IconBrush="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+
+                </Button>
+
+            </DockPanel>
+
+        </Border>
+
+    </Grid>
+
+</Window>

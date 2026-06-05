@@ -93,3 +93,25 @@ public enum DocumentType
     Certificate,
     Other
 }
+
+public enum Gender
+{
+    Male,
+    Female,
+    Other
+}
+
+public enum NationalityType
+{
+    Thai,
+    Foreign,
+    MigrantWorker
+}
+
+public enum SkillLevel
+{
+    None,
+    Basic,
+    Good,
+    Fluent
+}

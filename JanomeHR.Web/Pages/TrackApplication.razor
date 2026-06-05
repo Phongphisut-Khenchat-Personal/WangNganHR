@@ -1,48 +1,148 @@
 @page "/track"
 @inject ApiService Api
+@inject LocaleService Locale
+@implements IDisposable
 
-<PageTitle>ติดตามสถานะ — Janome Thailand</PageTitle>
+<PageTitle>@Locale.T("Track_Title") — @Locale.T("PageTitle_Suffix")</PageTitle>
 
 <div class="container track-page">
-    <h1>ติดตามสถานะใบสมัคร</h1>
-    <p class="subtitle">กรอกรหัสอ้างอิงที่ได้รับหลังสมัครงาน</p>
+    <h1>
+        <FaIcon Name="route" Class="page-title-icon" />
+        @Locale.T("Track_Title")
+    </h1>
+    <p class="subtitle">@Locale.T("Track_Subtitle")</p>
 
-    <div class="track-form">
-        <input @bind="_refCode"
-               @bind:event="oninput"
-               placeholder="เช่น JNM-A1234"
-               class="track-input"
-               @onkeydown="OnKeyDown"/>
-        <button class="btn-track" @onclick="Search" disabled="@_searching">
-            @(_searching ? "กำลังค้นหา..." : "ค้นหา")
+    <div class="track-mode-tabs" role="tablist">
+        <button type="button"
+                class="track-mode-btn @(_mode == SearchMode.Ref ? "active" : "")"
+                role="tab"
+                aria-selected="@(_mode == SearchMode.Ref)"
+                @onclick="() => SetMode(SearchMode.Ref)">
+            @Locale.T("Track_Mode_Ref")
+        </button>
+        <button type="button"
+                class="track-mode-btn @(_mode == SearchMode.Name ? "active" : "")"
+                role="tab"
+                aria-selected="@(_mode == SearchMode.Name)"
+                @onclick="() => SetMode(SearchMode.Name)">
+            @Locale.T("Track_Mode_Name")
         </button>
     </div>
 
-    @if (_notFound)
+    <div class="track-form @(_mode == SearchMode.Name ? "track-form-name" : "")">
+        @if (_mode == SearchMode.Ref)
+        {
+            <div class="track-input-wrap">
+                <FaIcon Name="search" Class="track-input-icon" />
+                <input @bind="_refCode"
+                       @bind:event="oninput"
+                       placeholder="@Locale.T("Track_Placeholder")"
+                       class="track-input track-input-ref"
+                       @onkeydown="OnKeyDown"/>
+            </div>
+        }
+        else
+        {
+            <div class="track-name-fields">
+                <div class="track-input-wrap">
+                    <FaIcon Name="user" Class="track-input-icon" />
+                    <input @bind="_name"
+                           @bind:event="oninput"
+                           placeholder="@Locale.T("Track_Name_Placeholder")"
+                           class="track-input"
+                           @onkeydown="OnKeyDown"/>
+                </div>
+                <div class="track-input-wrap">
+                    <FaIcon Name="phone" Class="track-input-icon" />
+                    <input @bind="_phone"
+                           @bind:event="oninput"
+                           placeholder="@Locale.T("Track_Phone_Placeholder")"
+                           class="track-input"
+                           inputmode="tel"
+                           @onkeydown="OnKeyDown"/>
+                </div>
+            </div>
+        }
+        <button type="button" class="btn-track" @onclick="Search" disabled="@_searching">
+            @if (_searching)
+            {
+                <FaIcon Name="spinner" Class="btn-icon" />
+                <text>@Locale.T("Track_Searching")</text>
+            }
+            else
+            {
+                <FaIcon Name="search" Class="btn-icon" />
+                <text>@Locale.T("Track_Search")</text>
+            }
+        </button>
+    </div>
+
+    @if (_mode == SearchMode.Name)
     {
-        <div class="not-found">ไม่พบรหัส "@_refCode" กรุณาตรวจสอบอีกครั้ง</div>
+        <p class="track-hint">@Locale.T("Track_Name_Hint")</p>
     }
 
-    @if (_result is not null)
+    @if (_notFound)
     {
-        <div class="track-result">
-            <div class="result-code">@_result.ReferenceCode</div>
-            <div class="result-job">@_result.JobPostingTitle</div>
-            <div class="result-status @GetStatusClass(_result.Status)">
-                @GetStatusText(_result.Status)
-            </div>
-            <div class="result-date">
-                สมัครเมื่อ @_result.CreatedAt.ToLocalTime().ToString("dd MMM yyyy HH:mm")
-            </div>
+        <div class="not-found">
+            <FaIcon Name="circle-xmark" Class="inline-icon" />
+            @if (_mode == SearchMode.Ref)
+            {
+                @Locale.F("Track_NotFound", _refCode)
+            }
+            else
+            {
+                @Locale.T("Track_NotFound_Name")
+            }
+        </div>
+    }
+
+    @if (_results.Count > 0)
+    {
+        @if (_mode == SearchMode.Name && _results.Count > 1)
+        {
+            <p class="track-multi-hint">@Locale.F("Track_MultiFound", _results.Count)</p>
+        }
+        <div class="track-results-list">
+            @foreach (var item in _results)
+            {
+                <div class="track-result">
+                    <div class="result-code">@item.ReferenceCode</div>
+                    <div class="result-job">@item.JobPostingTitle</div>
+                    <div class="result-status @GetStatusClass(item.Status)">
+                        @GetStatusText(item.Status)
+                    </div>
+                    <div class="result-date">
+                        <FaIcon Name="clock" Class="inline-icon" />
+                        @Locale.F("Track_AppliedAt", FormatAppliedAt(item.CreatedAt))
+                    </div>
+                </div>
+            }
         </div>
     }
 </div>
 
 @code {
+    private enum SearchMode { Ref, Name }
+
+    private SearchMode _mode = SearchMode.Ref;
     private string _refCode = "";
+    private string _name = "";
+    private string _phone = "";
     private bool _searching;
     private bool _notFound;
-    private TrackResult? _result;
+    private List<TrackResult> _results = [];
+
+    protected override void OnInitialized() =>
+        Locale.Changed += OnLocaleChanged;
+
+    private void SetMode(SearchMode mode)
+    {
+        if (_mode == mode) return;
+        _mode = mode;
+        _notFound = false;
+        _results = [];
+    }
 
     private async Task OnKeyDown(KeyboardEventArgs e)
     {
@@ -51,15 +151,25 @@
 
     private async Task Search()
     {
-        if (string.IsNullOrWhiteSpace(_refCode)) return;
         _searching = true;
         _notFound  = false;
-        _result    = null;
+        _results   = [];
 
         try
         {
-            _result = await Api.TrackApplicationAsync(_refCode.Trim().ToUpper());
-            if (_result is null) _notFound = true;
+            if (_mode == SearchMode.Ref)
+            {
+                if (string.IsNullOrWhiteSpace(_refCode)) return;
+                var single = await Api.TrackApplicationAsync(_refCode.Trim().ToUpper());
+                if (single is null) _notFound = true;
+                else _results = [single];
+            }
+            else
+            {
+                if (string.IsNullOrWhiteSpace(_name) || string.IsNullOrWhiteSpace(_phone)) return;
+                _results = await Api.TrackByIdentityAsync(_name.Trim(), _phone.Trim());
+                if (_results.Count == 0) _notFound = true;
+            }
         }
         catch { _notFound = true; }
         finally { _searching = false; }
@@ -67,19 +177,26 @@
 
     private string GetStatusText(string status) => status switch
     {
-        "New"       => "รับใบสมัครแล้ว",
-        "Review"    => "กำลังพิจารณา",
-        "Interview" => "นัดสัมภาษณ์แล้ว",
-        "Pass"      => "ผ่านการพิจารณา",
-        "Fail"      => "ไม่ผ่านการพิจารณา",
+        "New"       => Locale.T("Status_New"),
+        "Review"    => Locale.T("Status_Review"),
+        "Interview" => Locale.T("Status_Interview"),
+        "Pass"      => Locale.T("Status_Pass"),
+        "Fail"      => Locale.T("Status_Fail"),
         _           => status
     };
 
+    private string FormatAppliedAt(DateTime utc) =>
+        utc.ToLocalTime().ToString("dd MMM yyyy HH:mm", Locale.GetCulture());
+
     private string GetStatusClass(string status) => status switch
     {
-        "Pass"   => "status-pass",
-        "Fail"   => "status-fail",
+        "Pass"      => "status-pass",
+        "Fail"      => "status-fail",
         "Interview" => "status-interview",
-        _        => "status-default"
+        _           => "status-default"
     };
+
+    private void OnLocaleChanged() => InvokeAsync(StateHasChanged);
+
+    public void Dispose() => Locale.Changed -= OnLocaleChanged;
 }

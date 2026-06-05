@@ -37,8 +37,15 @@ namespace JanomeHR.API.Migrations
                     b.Property<DateOnly?>("Birthdate")
                         .HasColumnType("date");
 
+                    b.Property<string>("ComputerSkills")
+                        .HasColumnType("text");
+
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("District")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<string>("EducationField")
                         .HasColumnType("text");
@@ -51,6 +58,18 @@ namespace JanomeHR.API.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
+                    b.Property<string>("EmergencyContactName")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("EmergencyContactPhone")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<string>("EmergencyContactRelation")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
                     b.Property<int>("ExperienceYears")
                         .HasColumnType("integer");
 
@@ -58,6 +77,24 @@ namespace JanomeHR.API.Migrations
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Gender")
+                        .HasColumnType("text");
+
+                    b.Property<decimal?>("Gpa")
+                        .HasColumnType("decimal(3,2)");
+
+                    b.Property<int?>("GraduationYear")
+                        .HasColumnType("integer");
+
+                    b.Property<bool?>("HasDriversLicense")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool?>("HasOwnVehicle")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsFreshGraduate")
+                        .HasColumnType("boolean");
 
                     b.Property<Guid>("JobPostingId")
                         .HasColumnType("uuid");
@@ -67,18 +104,59 @@ namespace JanomeHR.API.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
+                    b.Property<decimal?>("LastSalary")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<string>("LineId")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("NationalId")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<string>("NationalityType")
+                        .HasColumnType("text");
+
                     b.Property<string>("Phone")
                         .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)");
+
+                    b.Property<string>("PostalCode")
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
+
+                    b.Property<string>("Province")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<string>("ReferenceCode")
                         .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)");
 
+                    b.Property<string>("RegisteredAddress")
+                        .HasColumnType("text");
+
                     b.Property<decimal?>("SalaryExpected")
                         .HasColumnType("decimal(10,2)");
+
+                    b.Property<bool>("SameAsCurrentAddress")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("SchoolName")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("SkillEnglish")
+                        .HasColumnType("text");
+
+                    b.Property<string>("SkillJapanese")
+                        .HasColumnType("text");
+
+                    b.Property<string>("SkillThai")
+                        .HasColumnType("text");
 
                     b.Property<string>("Source")
                         .IsRequired()
@@ -88,8 +166,21 @@ namespace JanomeHR.API.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("TitlePrefix")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
                     b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<bool?>("WillingOvertime")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool?>("WillingRelocate")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool?>("WillingShiftWork")
+                        .HasColumnType("boolean");
 
                     b.HasKey("Id");
 
@@ -124,7 +215,7 @@ namespace JanomeHR.API.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime>("UploadedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.HasKey("Id");
 
@@ -147,7 +238,7 @@ namespace JanomeHR.API.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<Guid>("CreatedBy")
                         .HasColumnType("uuid");
@@ -242,7 +333,7 @@ namespace JanomeHR.API.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int>("DurationMinutes")
                         .HasColumnType("integer");
@@ -261,7 +352,7 @@ namespace JanomeHR.API.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime>("ScheduledAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -286,11 +377,15 @@ namespace JanomeHR.API.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<string>("Benefits")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<DateTime?>("ClosedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<Guid>("CreatedBy")
                         .HasColumnType("uuid");
@@ -306,12 +401,20 @@ namespace JanomeHR.API.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime?>("PublishedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("QrCodeUrl")
                         .HasColumnType("text");
 
+                    b.Property<string>("Qualifications")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("Requirements")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Responsibilities")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -331,7 +434,15 @@ namespace JanomeHR.API.Migrations
                         .HasColumnType("character varying(150)");
 
                     b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("WorkHours")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("WorkLocation")
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
 
                     b.HasKey("Id");
 
@@ -352,7 +463,7 @@ namespace JanomeHR.API.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Event")
                         .IsRequired()
@@ -367,7 +478,7 @@ namespace JanomeHR.API.Migrations
                         .HasColumnType("character varying(100)");
 
                     b.Property<DateTime?>("SentAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -391,7 +502,7 @@ namespace JanomeHR.API.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -407,7 +518,7 @@ namespace JanomeHR.API.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<DateTime?>("LastLogin")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
@@ -431,6 +542,47 @@ namespace JanomeHR.API.Migrations
                         .IsUnique();
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("JanomeHR.Shared.Entities.WorkExperience", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ApplicationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("CompanyName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<DateOnly?>("EndDate")
+                        .HasColumnType("date");
+
+                    b.Property<string>("Position")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("character varying(150)");
+
+                    b.Property<string>("ReasonForLeaving")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Responsibilities")
+                        .HasColumnType("text");
+
+                    b.Property<decimal?>("Salary")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<DateOnly?>("StartDate")
+                        .HasColumnType("date");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApplicationId");
+
+                    b.ToTable("WorkExperiences");
                 });
 
             modelBuilder.Entity("JanomeHR.Shared.Entities.Application", b =>
@@ -523,6 +675,17 @@ namespace JanomeHR.API.Migrations
                     b.Navigation("Application");
                 });
 
+            modelBuilder.Entity("JanomeHR.Shared.Entities.WorkExperience", b =>
+                {
+                    b.HasOne("JanomeHR.Shared.Entities.Application", "Application")
+                        .WithMany("WorkExperiences")
+                        .HasForeignKey("ApplicationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Application");
+                });
+
             modelBuilder.Entity("JanomeHR.Shared.Entities.Application", b =>
                 {
                     b.Navigation("Documents");
@@ -532,6 +695,8 @@ namespace JanomeHR.API.Migrations
                     b.Navigation("Notes");
 
                     b.Navigation("Notifications");
+
+                    b.Navigation("WorkExperiences");
                 });
 
             modelBuilder.Entity("JanomeHR.Shared.Entities.Department", b =>

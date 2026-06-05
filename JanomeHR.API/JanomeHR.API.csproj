@@ -6,6 +6,13 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <!-- Sign output so WDAC does not block dotnet ef / runtime (0x800711C7) -->
+  <Target Name="SignApiAssemblies" AfterTargets="Build"
+          Condition="'$(OS)' == 'Windows_NT'">
+    <Exec Command="powershell -NoProfile -ExecutionPolicy Bypass -File &quot;$(MSBuildProjectDirectory)\..\scripts\sign-assemblies.ps1&quot; -OutputDir &quot;$(OutputPath.TrimEnd('\'))&quot;"
+          IgnoreExitCode="false" />
+  </Target>
+
   <ItemGroup>
     <ProjectReference Include="..\JanomeHR.Shared\JanomeHR.Shared.csproj" />
   </ItemGroup>

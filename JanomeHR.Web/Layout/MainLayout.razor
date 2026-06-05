@@ -1,5 +1,88 @@
 ﻿@inherits LayoutComponentBase
+@inject LocaleService Locale
+@implements IDisposable
 
-<main>
-    @Body
-</main>
+@if (!_ready)
+{
+    <div class="loading boot-loading">
+        <FaIcon Name="spinner" Class="loading-fa" />
+    </div>
+}
+else
+{
+    <div class="@(_menuOpen ? "menu-open" : null)">
+        <header class="site-header">
+            <div class="site-header-inner">
+                <a href="/" class="site-brand" @onclick="CloseMenu">
+                    <span class="site-brand-mark">JANOME</span>
+                    <span class="site-brand-sub">@Locale.T("Brand_Recruitment")</span>
+                </a>
+                <button type="button"
+                        class="menu-toggle"
+                        aria-label="@Locale.T("Nav_Menu")"
+                        aria-expanded="@_menuOpen"
+                        @onclick="ToggleMenu">
+                    <FaIcon Name="@(_menuOpen ? "xmark" : "bars")" Class="menu-toggle-icon" />
+                </button>
+            </div>
+        </header>
+
+        @if (_menuOpen)
+        {
+            <div class="sidebar-backdrop" @onclick="CloseMenu"></div>
+        }
+
+        <aside class="site-sidebar @(_menuOpen ? "open" : "")" aria-hidden="@(!_menuOpen)">
+            <div class="sidebar-head">
+                <span class="sidebar-title">@Locale.T("Nav_Menu")</span>
+                <button type="button" class="sidebar-close" aria-label="@Locale.T("Nav_Close")" @onclick="CloseMenu">
+                    <FaIcon Name="xmark" />
+                </button>
+            </div>
+            <nav class="sidebar-nav">
+                <NavLink href="/" class="sidebar-nav-link" Match="NavLinkMatch.All" @onclick="CloseMenu">
+                    <FaIcon Name="briefcase" Class="sidebar-nav-icon" />
+                    @Locale.T("Nav_Jobs")
+                </NavLink>
+                <NavLink href="track" class="sidebar-nav-link" @onclick="CloseMenu">
+                    <FaIcon Name="route" Class="sidebar-nav-icon" />
+                    @Locale.T("Nav_Track")
+                </NavLink>
+            </nav>
+            <div class="sidebar-lang">
+                <LanguageSelector />
+            </div>
+        </aside>
+
+        <main class="site-main">
+            @Body
+        </main>
+
+        <footer class="site-footer">
+            <div class="site-footer-inner">
+                <p><FaIcon Name="building" Class="footer-icon" /> @Locale.T("Footer_Company")</p>
+                <p class="footer-note">@Locale.T("Footer_Note")</p>
+            </div>
+        </footer>
+    </div>
+}
+
+@code {
+    private bool _ready;
+    private bool _menuOpen;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Locale.InitializeAsync();
+        Locale.Changed += OnLocaleChanged;
+        _ready = true;
+    }
+
+    private void ToggleMenu() => _menuOpen = !_menuOpen;
+
+    private void CloseMenu() => _menuOpen = false;
+
+    private void OnLocaleChanged() => InvokeAsync(StateHasChanged);
+
+    public void Dispose() => Locale.Changed -= OnLocaleChanged;
+}

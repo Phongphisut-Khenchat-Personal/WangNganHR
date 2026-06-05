@@ -1,0 +1,123 @@
+@page "/job/{JobId}"
+@inject ApiService Api
+@inject NavigationManager Nav
+@inject LocaleService Locale
+@implements IDisposable
+
+<PageTitle>@(_job?.Title ?? Locale.T("Job_Detail_Title")) — @Locale.T("PageTitle_Suffix")</PageTitle>
+
+@if (_loading)
+{
+    <div class="container loading">
+        <FaIcon Name="spinner" Class="loading-fa" />
+        <p>@Locale.T("Loading")</p>
+    </div>
+}
+else if (_job is null)
+{
+    <div class="container empty-state">
+        <FaIcon Name="circle-xmark" Class="empty-icon" />
+        <p>@Locale.T("Apply_NotFound")</p>
+        <a href="/" class="text-link"><FaIcon Name="arrow-left" Class="inline-icon" /> @Locale.T("Apply_BackList")</a>
+    </div>
+}
+else
+{
+    <div class="job-detail-hero">
+        <div class="back-btn" @onclick='() => Nav.NavigateTo("/")'>
+            <FaIcon Name="arrow-left" Class="inline-icon" /> @Locale.T("Apply_BackList")
+        </div>
+        <div class="job-dept">
+            <FaIcon Name="building" Class="job-meta-icon" />
+            @_job.DepartmentName
+        </div>
+        <h1>@_job.Title</h1>
+        <div class="job-detail-meta">
+            @if (_job.SalaryMin.HasValue)
+            {
+                <span class="salary">
+                    <FaIcon Name="money" Class="job-meta-icon" />
+                    ฿@_job.SalaryMin.Value.ToString("N0")
+                    @if (_job.SalaryMax.HasValue)
+                    { <text> – ฿@_job.SalaryMax.Value.ToString("N0")</text> }
+                </span>
+            }
+            <span class="positions">
+                <FaIcon Name="users" Class="job-meta-icon" />
+                @Locale.F("Job_Positions", _job.PositionsCount)
+            </span>
+            @if (!string.IsNullOrWhiteSpace(_job.WorkHours))
+            {
+                <span class="work-hours">
+                    <FaIcon Name="clock" Class="job-meta-icon" />
+                    @_job.WorkHours
+                </span>
+            }
+            @if (!string.IsNullOrWhiteSpace(_job.WorkLocation))
+            {
+                <span class="work-location">
+                    <FaIcon Name="location" Class="job-meta-icon" />
+                    @_job.WorkLocation
+                </span>
+            }
+        </div>
+    </div>
+
+    <div class="container job-detail-body">
+        @RenderSection(Locale.T("Job_Responsibilities"), _job.Responsibilities)
+        @RenderSection(Locale.T("Job_Qualifications"), _job.Qualifications)
+        @if (_job.Benefits.Count > 0)
+        {
+            @RenderSection(Locale.T("Job_Benefits"), _job.Benefits)
+        }
+
+        <div class="job-detail-actions">
+            <button type="button" class="btn-apply btn-apply-lg" @onclick='() => Nav.NavigateTo($"/apply/{_job.Id}")'>
+                @Locale.T("Job_Apply") <FaIcon Name="arrow-right" Class="btn-icon" />
+            </button>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public string JobId { get; set; } = "";
+
+    private JobPostingItem? _job;
+    private bool _loading = true;
+
+    protected override void OnInitialized() =>
+        Locale.Changed += OnLocaleChanged;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _loading = true;
+        try { _job = await Api.GetJobByIdAsync(JobId); }
+        finally { _loading = false; }
+    }
+
+    private RenderFragment RenderSection(string title, List<string> items) => builder =>
+    {
+        if (items.Count == 0) return;
+
+        builder.OpenElement(0, "section");
+        builder.AddAttribute(1, "class", "job-detail-section");
+        builder.OpenElement(2, "h2");
+        builder.AddContent(3, title);
+        builder.CloseElement();
+        builder.OpenElement(4, "ul");
+        builder.AddAttribute(5, "class", "job-bullet-list");
+        var seq = 6;
+        foreach (var item in items)
+        {
+            builder.OpenElement(seq++, "li");
+            builder.AddContent(seq++, item);
+            builder.CloseElement();
+        }
+        builder.CloseElement();
+        builder.CloseElement();
+    };
+
+    private void OnLocaleChanged() => InvokeAsync(StateHasChanged);
+
+    public void Dispose() => Locale.Changed -= OnLocaleChanged;
+}

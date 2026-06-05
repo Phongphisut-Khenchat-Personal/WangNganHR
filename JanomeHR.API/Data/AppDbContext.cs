@@ -1,6 +1,7 @@
 using JanomeHR.Shared.Entities;
 using JanomeHR.Shared.Enums;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 
 namespace JanomeHR.API.Data;
 
@@ -12,6 +13,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Application> Applications => Set<Application>();
     public DbSet<ApplicationDocument> ApplicationDocuments => Set<ApplicationDocument>();
     public DbSet<ApplicationNote> ApplicationNotes => Set<ApplicationNote>();
+    public DbSet<WorkExperience> WorkExperiences => Set<WorkExperience>();
     public DbSet<Interview> Interviews => Set<Interview>();
     public DbSet<Notification> Notifications => Set<Notification>();
 
@@ -39,6 +41,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         });
 
         // ── JobPosting ────────────────────────────
+        var jsonOpts = new JsonSerializerOptions();
+
         mb.Entity<JobPosting>(e =>
         {
             e.HasKey(x => x.Id);
@@ -46,6 +50,20 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             e.Property(x => x.Status).HasConversion<string>();
             e.Property(x => x.SalaryMin).HasColumnType("decimal(10,2)");
             e.Property(x => x.SalaryMax).HasColumnType("decimal(10,2)");
+            e.Property(x => x.WorkHours).HasMaxLength(200);
+            e.Property(x => x.WorkLocation).HasMaxLength(300);
+            e.Property(x => x.Responsibilities)
+             .HasConversion(
+                v => JsonSerializer.Serialize(v, jsonOpts),
+                v => JsonSerializer.Deserialize<List<string>>(v) ?? new List<string>());
+            e.Property(x => x.Qualifications)
+             .HasConversion(
+                v => JsonSerializer.Serialize(v, jsonOpts),
+                v => JsonSerializer.Deserialize<List<string>>(v) ?? new List<string>());
+            e.Property(x => x.Benefits)
+             .HasConversion(
+                v => JsonSerializer.Serialize(v, jsonOpts),
+                v => JsonSerializer.Deserialize<List<string>>(v) ?? new List<string>());
 
             e.HasOne(x => x.Department)
              .WithMany(x => x.JobPostings)
@@ -67,6 +85,24 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             e.Property(x => x.LastName).HasMaxLength(100).IsRequired();
             e.Property(x => x.Phone).HasMaxLength(20).IsRequired();
             e.Property(x => x.Email).HasMaxLength(100);
+            e.Property(x => x.TitlePrefix).HasMaxLength(20);
+            e.Property(x => x.NationalId).HasMaxLength(20);
+            e.Property(x => x.LineId).HasMaxLength(50);
+            e.Property(x => x.Province).HasMaxLength(100);
+            e.Property(x => x.District).HasMaxLength(100);
+            e.Property(x => x.PostalCode).HasMaxLength(10);
+            e.Property(x => x.EmergencyContactName).HasMaxLength(100);
+            e.Property(x => x.EmergencyContactPhone).HasMaxLength(20);
+            e.Property(x => x.EmergencyContactRelation).HasMaxLength(50);
+            e.Property(x => x.ReferralSource).HasMaxLength(100);
+            e.Property(x => x.SchoolName).HasMaxLength(200);
+            e.Property(x => x.Gpa).HasColumnType("decimal(3,2)");
+            e.Property(x => x.Gender).HasConversion<string>();
+            e.Property(x => x.NationalityType).HasConversion<string>();
+            e.Property(x => x.SkillThai).HasConversion<string>();
+            e.Property(x => x.SkillEnglish).HasConversion<string>();
+            e.Property(x => x.SkillJapanese).HasConversion<string>();
+            e.Property(x => x.LastSalary).HasColumnType("decimal(10,2)");
             e.Property(x => x.Status).HasConversion<string>();
             e.Property(x => x.Source).HasConversion<string>();
             e.Property(x => x.EducationLevel).HasConversion<string>();
@@ -77,6 +113,20 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
              .WithMany(x => x.Applications)
              .HasForeignKey(x => x.JobPostingId)
              .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // ── WorkExperience ────────────────────────
+        mb.Entity<WorkExperience>(e =>
+        {
+            e.HasKey(x => x.Id);
+            e.Property(x => x.CompanyName).HasMaxLength(200).IsRequired();
+            e.Property(x => x.Position).HasMaxLength(150).IsRequired();
+            e.Property(x => x.Salary).HasColumnType("decimal(10,2)");
+
+            e.HasOne(x => x.Application)
+             .WithMany(x => x.WorkExperiences)
+             .HasForeignKey(x => x.ApplicationId)
+             .OnDelete(DeleteBehavior.Cascade);
         });
 
         // ── ApplicationDocument ───────────────────

@@ -1,0 +1,30 @@
+@inject LocaleService Locale
+@implements IDisposable
+
+<label class="lang-picker" aria-label="@Locale.T("Lang_PickerLabel")">
+    <FaIcon Name="globe" Class="lang-picker-icon" />
+    <select class="lang-picker-select"
+            aria-label="@Locale.T("Lang_PickerLabel")"
+            value="@Locale.Culture"
+            @onchange="OnCultureChanged">
+        @foreach (var lang in Locale.Languages)
+        {
+            <option value="@lang.Code">@Locale.T(lang.LabelKey)</option>
+        }
+    </select>
+</label>
+
+@code {
+    protected override void OnInitialized() =>
+        Locale.Changed += OnLocaleChanged;
+
+    private async Task OnCultureChanged(ChangeEventArgs e)
+    {
+        var code = e.Value?.ToString() ?? "en";
+        await Locale.SetCultureAsync(code);
+    }
+
+    private void OnLocaleChanged() => InvokeAsync(StateHasChanged);
+
+    public void Dispose() => Locale.Changed -= OnLocaleChanged;
+}

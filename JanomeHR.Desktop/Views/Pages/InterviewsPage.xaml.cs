@@ -1,3 +1,4 @@
+using JanomeHR.Desktop.Localization;
 using JanomeHR.Desktop.Models;
 using JanomeHR.Desktop.Services;
 using System.Windows;
@@ -10,37 +11,56 @@ public partial class InterviewsPage : Page
 {
     private readonly ApiService _api;
     private DateTime _currentDate = DateTime.Today;
+    private List<InterviewItem> _items = [];
 
     public InterviewsPage(ApiService api)
     {
         InitializeComponent();
         _api = api;
         Loaded += async (_, _) => await LoadAsync();
+        LocalizationService.Instance.LanguageChanged += OnLanguageChanged;
+    }
+
+    private void OnLanguageChanged()
+    {
+        if (IsLoaded) Dispatcher.Invoke(RefreshLocalizedUi);
     }
 
     private async Task LoadAsync()
     {
-        TxtDate.Text = _currentDate.ToString("dddd dd MMMM yyyy",
-            new System.Globalization.CultureInfo("th-TH"));
-
         try
         {
-            var items = await _api.GetInterviewsAsync(_currentDate);
-            var rows  = items.Select(i => new InterviewRow(i)).ToList();
-
-            LstInterviews.ItemsSource = rows;
-            TxtEmpty.Visibility = rows.Any()
-                ? Visibility.Collapsed
-                : Visibility.Visible;
-
-            TxtTotalToday.Text = rows.Count.ToString();
-            TxtOnline.Text     = rows.Count(r => r.Type == "Online").ToString();
-            TxtOnsite.Text     = rows.Count(r => r.Type == "Onsite").ToString();
+            _items = await _api.GetInterviewsAsync(_currentDate);
+            RefreshLocalizedUi();
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"โหลดข้อมูลไม่ได้: {ex.Message}");
+            MessageBox.Show(Loc.F("Msg_LoadFailed", ex.Message));
         }
+    }
+
+    private void RefreshLocalizedUi()
+    {
+        UpdateHeaders();
+        TxtDate.Text = _currentDate.ToString("dddd dd MMMM yyyy", LocalizationCulture.Current);
+
+        var rows = _items.Select(i => new InterviewRow(i)).ToList();
+        LstInterviews.ItemsSource = rows;
+        TxtEmpty.Visibility = rows.Any() ? Visibility.Collapsed : Visibility.Visible;
+
+        TxtTotalToday.Text = rows.Count.ToString();
+        TxtOnline.Text     = rows.Count(r => r.Type == "Online").ToString();
+        TxtOnsite.Text     = rows.Count(r => r.Type == "Onsite").ToString();
+    }
+
+    private void UpdateHeaders()
+    {
+        HdrTime.Text        = Loc.T("Col_Time");
+        HdrApplicant.Text   = Loc.T("Col_Applicant");
+        HdrJob.Text         = Loc.T("Col_Job");
+        HdrInterviewer.Text = Loc.T("Col_Interviewer");
+        HdrType.Text        = Loc.T("Col_Type");
+        HdrStatus.Text      = Loc.T("Col_Status");
     }
 
     private async void BtnPrevDay_Click(object s, RoutedEventArgs e)
@@ -83,31 +103,33 @@ public class InterviewRow
         ApplicantName   = i.ApplicantName;
         JobPostingTitle = i.JobPostingTitle;
         InterviewerName = i.InterviewerName;
-        DurationText    = $"{i.DurationMinutes} นาที";
+        DurationText    = Loc.F("Duration_Minutes", i.DurationMinutes);
         Type            = i.Type;
+        TypeText        = StatusLocalizer.InterviewType(i.Type);
 
-        (TypeText, TypeColor, TypeTextColor) = i.Type switch
+        (TypeColor, TypeTextColor) = i.Type switch
         {
-            "Online" => ("Online",
+            "Online" => (
                 new SolidColorBrush(Color.FromRgb(230,244,236)),
                 new SolidColorBrush(Color.FromRgb(26,122,74))),
-            _ => ("Onsite",
+            _ => (
                 new SolidColorBrush(Color.FromRgb(254,243,199)),
                 new SolidColorBrush(Color.FromRgb(180,83,9)))
         };
 
-        (StatusText, StatusColor, StatusTextColor) = i.Status switch
+        StatusText = StatusLocalizer.InterviewStatus(i.Status);
+        (StatusColor, StatusTextColor) = i.Status switch
         {
-            "Scheduled" => ("รอสัมภาษณ์",
+            "Scheduled" => (
                 new SolidColorBrush(Color.FromRgb(219,234,254)),
                 new SolidColorBrush(Color.FromRgb(29,78,216))),
-            "Done" => ("เสร็จแล้ว",
+            "Done" or "Completed" => (
                 new SolidColorBrush(Color.FromRgb(230,244,236)),
                 new SolidColorBrush(Color.FromRgb(26,122,74))),
-            "Cancelled" => ("ยกเลิก",
+            "Cancelled" => (
                 new SolidColorBrush(Color.FromRgb(244,244,242)),
                 new SolidColorBrush(Color.FromRgb(107,107,107))),
-            _ => (i.Status,
+            _ => (
                 new SolidColorBrush(Colors.LightGray),
                 new SolidColorBrush(Colors.Black))
         };

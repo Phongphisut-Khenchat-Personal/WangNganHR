@@ -1,0 +1,18 @@
+<UserControl x:Class="JanomeHR.Desktop.Controls.FaButtonContent"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:JanomeHR.Desktop.Controls"
+             VerticalAlignment="Center"
+             HorizontalAlignment="{Binding HorizontalContentAlignment, RelativeSource={RelativeSource AncestorType=Button}}">
+    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+        <controls:FaIcon x:Name="PART_Icon"
+                         Icon="{Binding Icon, RelativeSource={RelativeSource AncestorType=controls:FaButtonContent}}"
+                         IconBrush="{Binding IconBrush, RelativeSource={RelativeSource AncestorType=controls:FaButtonContent}}"
+                         Width="18" Height="18"
+                         Margin="0,0,10,0"
+                         VerticalAlignment="Center"/>
+        <TextBlock Text="{Binding Label, RelativeSource={RelativeSource AncestorType=controls:FaButtonContent}}"
+                   Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                   VerticalAlignment="Center"/>
+    </StackPanel>
+</UserControl>

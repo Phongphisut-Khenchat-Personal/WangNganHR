@@ -1,138 +1,75 @@
-using JanomeHR.API.Data;
-using JanomeHR.API.DTOs.Interview;
-using JanomeHR.API.Services.Interfaces;
-using JanomeHR.Shared.Entities;
-using JanomeHR.Shared.Enums;
-using Microsoft.EntityFrameworkCore;
+using JanomeHR.Desktop.Localization;
+using JanomeHR.Desktop.Services;
+using Microsoft.Extensions.DependencyInjection;
+using System.Windows;
+using System.Windows.Input;
 
-namespace JanomeHR.API.Services;
+namespace JanomeHR.Desktop.Views;
 
-public class InterviewService(AppDbContext db) : IInterviewService
+public partial class LoginWindow : Window
 {
-    public async Task<List<InterviewResponseDto>> GetAllAsync(DateTime? date)
+    private readonly ApiService _api;
+
+    public LoginWindow(ApiService api)
     {
-        var query = db.Interviews
-            .Include(i => i.Application)
-                .ThenInclude(a => a.JobPosting)
-            .Include(i => i.Interviewer)
-            .AsQueryable();
-
-        if (date.HasValue)
-            query = query.Where(i => i.ScheduledAt.Date == date.Value.Date);
-
-        var list = await query.OrderBy(i => i.ScheduledAt).ToListAsync();
-
-        return list.Select(i => new InterviewResponseDto(
-            i.Id,
-            $"{i.Application.FirstName} {i.Application.LastName}",
-            i.Application?.JobPosting?.Title ?? "",
-            i.Interviewer?.FullName ?? "",
-            i.ScheduledAt,
-            i.DurationMinutes,
-            i.Type.ToString(),
-            i.Location,
-            i.Status.ToString(),
-            i.Result.ToString(),
-            i.CreatedAt
-        )).ToList();
+        InitializeComponent();
+        _api = api;
     }
 
-    public async Task<InterviewResponseDto?> GetByIdAsync(Guid id)
-    {
-        var i = await db.Interviews
-            .Include(i => i.Application)
-                .ThenInclude(a => a.JobPosting)
-            .Include(i => i.Interviewer)
-            .FirstOrDefaultAsync(i => i.Id == id);
+    private void BtnSettings_Click(object sender, RoutedEventArgs e) =>
+        LanguageMenuHelper.Open(BtnSettings, LanguageMenu);
 
-        return i is null ? null : ToDto(i);
+    private void OnKeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.Enter)
+            _ = LoginAsync();
     }
 
-    public async Task<InterviewResponseDto> CreateAsync(CreateInterviewDto dto)
+    private async void BtnLogin_Click(object sender, RoutedEventArgs e) =>
+        await LoginAsync();
+
+    private async Task LoginAsync()
     {
-        if (!Enum.TryParse<InterviewType>(dto.Type, out var type))
-            type = InterviewType.Onsite;
+        TxtError.Visibility = Visibility.Collapsed;
+        var username = TxtUsername.Text.Trim();
+        var password = TxtPassword.Password;
 
-        var interview = new Interview
+        if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
         {
-            ApplicationId   = dto.ApplicationId,
-            InterviewerId   = dto.InterviewerId,
-            ScheduledAt     = dto.ScheduledAt,
-            DurationMinutes = dto.DurationMinutes,
-            Type            = type,
-            Location        = dto.Location,
-            Status          = InterviewStatus.Scheduled,
-            Result          = InterviewResult.Pending,
-        };
-
-        db.Interviews.Add(interview);
-
-        // อัปเดตสถานะใบสมัครเป็น Interview
-        var app = await db.Applications.FindAsync(dto.ApplicationId);
-        if (app is not null)
-        {
-            app.Status    = ApplicationStatus.Interview;
-            app.UpdatedAt = DateTime.UtcNow;
+            ShowError(Loc.T("Login_ErrorEmpty"));
+            return;
         }
 
-        await db.SaveChangesAsync();
+        BtnLogin.IsEnabled = false;
 
-        // reload with includes
-        var saved = await db.Interviews
-            .Include(i => i.Application)
-                .ThenInclude(a => a.JobPosting)
-            .Include(i => i.Interviewer)
-            .FirstAsync(i => i.Id == interview.Id);
-
-        return ToDto(saved);
-    }
-
-    public async Task<bool> UpdateResultAsync(Guid id, UpdateInterviewResultDto dto)
-    {
-        var interview = await db.Interviews
-            .Include(i => i.Application)
-            .FirstOrDefaultAsync(i => i.Id == id);
-
-        if (interview is null) return false;
-
-        if (Enum.TryParse<InterviewResult>(dto.Result, out var result))
+        try
         {
-            interview.Result = result;
-            interview.Status = InterviewStatus.Done;
-            interview.Notes  = dto.Notes;
+            var result = await _api.LoginAsync(username, password);
+            if (result is null)
+            {
+                ShowError(Loc.T("Login_ErrorFailed"));
+                return;
+            }
 
-            // sync สถานะใบสมัคร
-            interview.Application.Status = result == InterviewResult.Pass
-                ? ApplicationStatus.Pass
-                : ApplicationStatus.Fail;
-            interview.Application.UpdatedAt = DateTime.UtcNow;
+            _api.SetToken(result.Token);
+
+            var main = App.Services.GetRequiredService<MainWindow>();
+            main.Show();
+            Close();
         }
-
-        await db.SaveChangesAsync();
-        return true;
+        catch
+        {
+            ShowError(Loc.T("Login_ErrorApi"));
+        }
+        finally
+        {
+            BtnLogin.IsEnabled = true;
+        }
     }
 
-    public async Task<bool> CancelAsync(Guid id)
+    private void ShowError(string message)
     {
-        var interview = await db.Interviews.FindAsync(id);
-        if (interview is null) return false;
-
-        interview.Status = InterviewStatus.Cancelled;
-        await db.SaveChangesAsync();
-        return true;
+        TxtError.Text = message;
+        TxtError.Visibility = Visibility.Visible;
     }
-
-    private static InterviewResponseDto ToDto(Interview i) => new(
-        i.Id,
-        $"{i.Application.FirstName} {i.Application.LastName}",
-        i.Application?.JobPosting?.Title ?? "",
-        i.Interviewer?.FullName ?? "",
-        i.ScheduledAt,
-        i.DurationMinutes,
-        i.Type.ToString(),
-        i.Location,
-        i.Status.ToString(),
-        i.Result.ToString(),
-        i.CreatedAt
-    );
 }

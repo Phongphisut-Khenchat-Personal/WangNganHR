@@ -1,10 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "C9o7aEGktsk=",
+  "dgSpecHash": "x8kipzLBYaI=",
   "success": true,
   "projectFilePath": "C:\\Projects\\JanomeHR\\JanomeHR.Desktop\\JanomeHR.Desktop.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\choku\\.nuget\\packages\\communitytoolkit.mvvm\\8.4.2\\communitytoolkit.mvvm.8.4.2.nupkg.sha512",
+    "C:\\Users\\choku\\.nuget\\packages\\mahapps.metro.iconpacks.core\\6.2.1\\mahapps.metro.iconpacks.core.6.2.1.nupkg.sha512",
+    "C:\\Users\\choku\\.nuget\\packages\\mahapps.metro.iconpacks.fontawesome\\6.2.1\\mahapps.metro.iconpacks.fontawesome.6.2.1.nupkg.sha512",
     "C:\\Users\\choku\\.nuget\\packages\\microsoft.extensions.configuration\\10.0.8\\microsoft.extensions.configuration.10.0.8.nupkg.sha512",
     "C:\\Users\\choku\\.nuget\\packages\\microsoft.extensions.configuration.abstractions\\10.0.8\\microsoft.extensions.configuration.abstractions.10.0.8.nupkg.sha512",
     "C:\\Users\\choku\\.nuget\\packages\\microsoft.extensions.configuration.binder\\10.0.8\\microsoft.extensions.configuration.binder.10.0.8.nupkg.sha512",

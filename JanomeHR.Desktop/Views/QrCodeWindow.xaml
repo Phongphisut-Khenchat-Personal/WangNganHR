@@ -1,33 +1,68 @@
 <Window x:Class="JanomeHR.Desktop.Views.QrCodeWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="QR Code สำหรับสมัครงาน"
-        Height="420" Width="360"
+        xmlns:controls="clr-namespace:JanomeHR.Desktop.Controls"
+        Title="{DynamicResource Qr_Title}"
+        Height="440" Width="380"
         WindowStartupLocation="CenterOwner"
-        Background="#F4F4F2" ResizeMode="NoResize">
+        Background="#F4F4F2" ResizeMode="NoResize"
+        FontFamily="{StaticResource AppFont}"
+        FontSize="{StaticResource FontSizeMin}">
+
     <StackPanel Margin="32">
+
         <Border Background="#1A1A1A" Padding="16,12" Margin="0,0,0,20">
-            <TextBlock Text="QR Code สมัครงาน"
-                       Foreground="White" FontSize="16"
-                       FontWeight="SemiBold" HorizontalAlignment="Center"/>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+
+                <controls:FaIcon Icon="qrcode" IconBrush="White" Width="22" Height="22" Margin="0,0,10,0"/>
+
+                <TextBlock Text="{DynamicResource Qr_Heading}"
+
+                           Foreground="White" FontSize="{StaticResource FontSizeHeading}"
+
+                           FontWeight="SemiBold" VerticalAlignment="Center"/>
+
+            </StackPanel>
+
         </Border>
+
+
 
         <Border Background="White" Padding="16"
+
                 BorderBrush="#E0DEDD" BorderThickness="1"
+
                 HorizontalAlignment="Center" Margin="0,0,0,20">
-            <Image x:Name="ImgQr" Width="240" Height="240"
-                   Stretch="Uniform"/>
+
+            <Image x:Name="ImgQr" Width="240" Height="240" Stretch="Uniform"/>
+
         </Border>
 
-        <TextBlock Text="พิมพ์และติดที่ป้อมยาม" FontSize="13"
-                   Foreground="#888" HorizontalAlignment="Center"
+
+
+        <TextBlock Text="{DynamicResource Qr_Hint}"
+
+                   Style="{StaticResource LabelCaption}"
+
+                   HorizontalAlignment="Center"
+
                    Margin="0,0,0,16"/>
 
-        <Button Content="พิมพ์ / บันทึก"
-                Padding="16,10" FontSize="14"
-                Background="#C8102E" Foreground="White"
-                BorderThickness="0" Cursor="Hand"
+
+
+        <Button Style="{StaticResource PrimaryButton}"
+
                 HorizontalAlignment="Stretch"
-                Click="BtnPrint_Click"/>
+
+                Click="BtnPrint_Click">
+
+            <controls:FaButtonContent Icon="print" Label="{DynamicResource Btn_PrintSave}"
+
+                IconBrush="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+
+        </Button>
+
     </StackPanel>
+
 </Window>

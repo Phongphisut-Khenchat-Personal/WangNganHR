@@ -1,0 +1,49 @@
+<i class="@CssClass" style="@Style" aria-hidden="true"></i>
+
+@code {
+    [Parameter] public string Name { get; set; } = "";
+    [Parameter] public string? Class { get; set; }
+    [Parameter] public string? Style { get; set; }
+
+    private string CssClass => (Name switch
+    {
+        "briefcase" => "fa-solid fa-briefcase",
+        "building" => "fa-solid fa-building",
+        "qrcode" => "fa-solid fa-qrcode",
+        "clipboard-list" => "fa-solid fa-clipboard-list",
+        "calendar" => "fa-solid fa-calendar-days",
+        "bullhorn" => "fa-solid fa-bullhorn",
+        "rotate" => "fa-solid fa-arrows-rotate",
+        "plus" => "fa-solid fa-plus",
+        "lock" => "fa-solid fa-lock",
+        "print" => "fa-solid fa-print",
+        "save" => "fa-solid fa-floppy-disk",
+        "sign-in" => "fa-solid fa-right-to-bracket",
+        "search" => "fa-solid fa-magnifying-glass",
+        "chevron-left" => "fa-solid fa-chevron-left",
+        "chevron-right" => "fa-solid fa-chevron-right",
+        "circle-check" => "fa-solid fa-circle-check",
+        "arrow-left" => "fa-solid fa-arrow-left",
+        "arrow-right" => "fa-solid fa-arrow-right",
+        "user" => "fa-solid fa-user",
+        "phone" => "fa-solid fa-phone",
+        "envelope" => "fa-solid fa-envelope",
+        "graduation-cap" => "fa-solid fa-graduation-cap",
+        "money" => "fa-solid fa-money-bill-wave",
+        "location" => "fa-solid fa-location-dot",
+        "clock" => "fa-solid fa-clock",
+        "eye" => "fa-solid fa-eye",
+        "spinner" => "fa-solid fa-spinner fa-spin",
+        "circle-xmark" => "fa-solid fa-circle-xmark",
+        "circle-question" => "fa-solid fa-circle-question",
+        "users" => "fa-solid fa-users",
+        "route" => "fa-solid fa-route",
+        "globe" => "fa-solid fa-globe",
+        "bars" => "fa-solid fa-bars",
+        "xmark" => "fa-solid fa-xmark",
+        "file" => "fa-solid fa-file-lines",
+        "upload" => "fa-solid fa-upload",
+        "trash" => "fa-solid fa-trash",
+        _ => "fa-solid fa-circle"
+    }) + (string.IsNullOrWhiteSpace(Class) ? "" : " " + Class);
+}

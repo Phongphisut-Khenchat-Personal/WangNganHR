@@ -1,3 +1,4 @@
+using JanomeHR.Desktop.Localization;
 using System.IO;
 using System.Windows;
 using System.Windows.Media.Imaging;
@@ -31,7 +32,7 @@ public partial class QrCodeWindow : Window
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"ไม่สามารถโหลด QR Code ได้: {ex.Message}");
+            MessageBox.Show(Loc.F("Msg_QrLoadFailed", ex.Message));
         }
     }
 
@@ -46,12 +47,14 @@ public partial class QrCodeWindow : Window
                 $"JanomeHR_QRCode_{DateTime.Now:yyyyMMdd_HHmmss}.png");
 
             File.WriteAllBytes(savePath, bytes);
-            MessageBox.Show($"บันทึก QR Code ไปที่ Desktop แล้ว\n{savePath}",
-                "สำเร็จ", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show(
+                Loc.F("Msg_QrSaved", Environment.NewLine, savePath),
+                Loc.T("Msg_SuccessTitle"),
+                MessageBoxButton.OK, MessageBoxImage.Information);
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"บันทึกไม่สำเร็จ: {ex.Message}");
+            MessageBox.Show(Loc.F("Msg_QrSaveFailed", ex.Message));
         }
     }
 }

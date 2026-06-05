@@ -62,6 +62,9 @@ public class ApiService
         return result ?? [];
     }
 
+    public async Task<JobPostingItem?> GetJobPostingAsync(Guid id) =>
+        await _http.GetFromJsonAsync<JobPostingItem>($"{Base}/api/JobPostings/{id}");
+
     public async Task<JobPostingItem?> CreateJobPostingAsync(
         CreateJobPostingRequest req)
     {
@@ -69,6 +72,12 @@ public class ApiService
             $"{Base}/api/JobPostings", req);
         if (!res.IsSuccessStatusCode) return null;
         return await res.Content.ReadFromJsonAsync<JobPostingItem>();
+    }
+
+    public async Task<bool> UpdateJobPostingAsync(Guid id, UpdateJobPostingRequest req)
+    {
+        var res = await _http.PutAsJsonAsync($"{Base}/api/JobPostings/{id}", req);
+        return res.IsSuccessStatusCode;
     }
 
     public async Task<bool> PublishJobPostingAsync(Guid id)

@@ -1,0 +1,4 @@
+C:\Projects\WangNganHR\publish\web\wwwroot\index.html
+C:\Projects\WangNganHR\publish\web\WangNganHR.Web.runtimeconfig.json
+C:\Projects\WangNganHR\publish\web\dotnet.js
+C:\Projects\WangNganHR\publish\web\web.config

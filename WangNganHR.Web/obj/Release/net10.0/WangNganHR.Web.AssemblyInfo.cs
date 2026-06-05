@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("WangNganHR.Web")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e7b78caa881b483c79c9f5b4f684cbf418e7f2b0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+fbe7e3ba66d719c7c51d36375c4a7069d568ecc2")]
 [assembly: System.Reflection.AssemblyProductAttribute("WangNganHR.Web")]
 [assembly: System.Reflection.AssemblyTitleAttribute("WangNganHR.Web")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

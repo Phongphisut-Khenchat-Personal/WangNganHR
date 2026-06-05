@@ -2443,11 +2443,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Projects\\JanomeHR\\WangNganHR.Web\\WangNganHR.Web.csproj",
+      "projectUniqueName": "C:\\Projects\\WangNganHR\\WangNganHR.Web\\WangNganHR.Web.csproj",
       "projectName": "WangNganHR.Web",
-      "projectPath": "C:\\Projects\\JanomeHR\\WangNganHR.Web\\WangNganHR.Web.csproj",
+      "projectPath": "C:\\Projects\\WangNganHR\\WangNganHR.Web\\WangNganHR.Web.csproj",
       "packagesPath": "C:\\Users\\choku\\.nuget\\packages\\",
-      "outputPath": "C:\\Projects\\JanomeHR\\WangNganHR.Web\\obj\\",
+      "outputPath": "C:\\Projects\\WangNganHR\\WangNganHR.Web\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\choku\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -2463,8 +2463,8 @@
           "framework": "net10.0",
           "targetAlias": "net10.0",
           "projectReferences": {
-            "C:\\Projects\\JanomeHR\\WangNganHR.Shared\\WangNganHR.Shared.csproj": {
-              "projectPath": "C:\\Projects\\JanomeHR\\WangNganHR.Shared\\WangNganHR.Shared.csproj"
+            "C:\\Projects\\WangNganHR\\WangNganHR.Shared\\WangNganHR.Shared.csproj": {
+              "projectPath": "C:\\Projects\\WangNganHR\\WangNganHR.Shared\\WangNganHR.Shared.csproj"
             }
           }
         }

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "y+wbL8q2GTE=",
+  "dgSpecHash": "ZsX3sSoszXY=",
   "success": true,
-  "projectFilePath": "C:\\Projects\\JanomeHR\\WangNganHR.Web\\WangNganHR.Web.csproj",
+  "projectFilePath": "C:\\Projects\\WangNganHR\\WangNganHR.Web\\WangNganHR.Web.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\choku\\.nuget\\packages\\microsoft.aspnetcore.app.internal.assets\\10.0.8\\microsoft.aspnetcore.app.internal.assets.10.0.8.nupkg.sha512",
     "C:\\Users\\choku\\.nuget\\packages\\microsoft.aspnetcore.authorization\\10.0.8\\microsoft.aspnetcore.authorization.10.0.8.nupkg.sha512",

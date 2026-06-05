@@ -18,53 +18,53 @@ build_property.EntryPointFilePath =
 build_property._SupportedPlatformList = browser
 build_property.RootNamespace = WangNganHR.Web
 build_property.RootNamespace = WangNganHR.Web
-build_property.ProjectDir = C:\Projects\JanomeHR\WangNganHR.Web\
+build_property.ProjectDir = C:\Projects\WangNganHR\WangNganHR.Web\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = false
 build_property.RazorLangVersion = 10.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
-build_property.MSBuildProjectDirectory = C:\Projects\JanomeHR\WangNganHR.Web
+build_property.MSBuildProjectDirectory = C:\Projects\WangNganHR\WangNganHR.Web
 build_property._RazorSourceGeneratorDebug = 
 build_property.EffectiveAnalysisLevelStyle = 10.0
 build_property.EnableCodeStyleSeverity = 
 
-[C:/Projects/JanomeHR/WangNganHR.Web/App.razor]
+[C:/Projects/WangNganHR/WangNganHR.Web/App.razor]
 build_metadata.AdditionalFiles.TargetPath = QXBwLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Projects/JanomeHR/WangNganHR.Web/Components/FaIcon.razor]
+[C:/Projects/WangNganHR/WangNganHR.Web/Components/FaIcon.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xGYUljb24ucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Projects/JanomeHR/WangNganHR.Web/Components/LanguageSelector.razor]
+[C:/Projects/WangNganHR/WangNganHR.Web/Components/LanguageSelector.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xMYW5ndWFnZVNlbGVjdG9yLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Projects/JanomeHR/WangNganHR.Web/Pages/ApplyForm.razor]
+[C:/Projects/WangNganHR/WangNganHR.Web/Pages/ApplyForm.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQXBwbHlGb3JtLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Projects/JanomeHR/WangNganHR.Web/Pages/JobDetail.razor]
+[C:/Projects/WangNganHR/WangNganHR.Web/Pages/JobDetail.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSm9iRGV0YWlsLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Projects/JanomeHR/WangNganHR.Web/Pages/JobList.razor]
+[C:/Projects/WangNganHR/WangNganHR.Web/Pages/JobList.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSm9iTGlzdC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Projects/JanomeHR/WangNganHR.Web/Pages/NotFound.razor]
+[C:/Projects/WangNganHR/WangNganHR.Web/Pages/NotFound.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTm90Rm91bmQucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Projects/JanomeHR/WangNganHR.Web/Pages/TrackApplication.razor]
+[C:/Projects/WangNganHR/WangNganHR.Web/Pages/TrackApplication.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVHJhY2tBcHBsaWNhdGlvbi5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Projects/JanomeHR/WangNganHR.Web/_Imports.razor]
+[C:/Projects/WangNganHR/WangNganHR.Web/_Imports.razor]
 build_metadata.AdditionalFiles.TargetPath = X0ltcG9ydHMucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Projects/JanomeHR/WangNganHR.Web/Layout/MainLayout.razor]
+[C:/Projects/WangNganHR/WangNganHR.Web/Layout/MainLayout.razor]
 build_metadata.AdditionalFiles.TargetPath = TGF5b3V0XE1haW5MYXlvdXQucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = b-h7n08rzs0r

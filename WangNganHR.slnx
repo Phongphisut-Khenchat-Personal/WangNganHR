@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="WangNganHR.csproj" />
+  <Project Path="WangNganHR.API/WangNganHR.API.csproj" />
+  <Project Path="WangNganHR.Desktop/WangNganHR.Desktop.csproj" />
+  <Project Path="WangNganHR.Shared/WangNganHR.Shared.csproj" />
+  <Project Path="WangNganHR.Web/WangNganHR.Web.csproj" />
+</Solution>

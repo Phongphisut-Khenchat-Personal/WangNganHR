@@ -9,8 +9,8 @@ if (!File.Exists(script))
     return 1;
 }
 
-Console.WriteLine("Starting JanomeHR.Web (via scripts/run-web.ps1)...");
-Console.WriteLine("API:  dotnet run --project JanomeHR.API");
+Console.WriteLine("Starting WangNganHR.Web (via scripts/run-web.ps1)...");
+Console.WriteLine("API:  dotnet run --project WangNganHR.API");
 Console.WriteLine("Desktop: .\\scripts\\run-desktop.ps1");
 Console.WriteLine();
 

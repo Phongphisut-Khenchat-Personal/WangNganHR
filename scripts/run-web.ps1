@@ -1,5 +1,5 @@
-# Janome HR Web (Blazor WASM) — ปิด process เก่าที่พอร์ต 5203 ก่อนรัน
-# รัน API ก่อน: dotnet run --project JanomeHR.API
+# Wang Ngan HR Web (Blazor WASM) — ปิด process เก่าที่พอร์ต 5203 ก่อนรัน
+# รัน API ก่อน: dotnet run --project WangNganHR.API
 
 Set-Location $PSScriptRoot\..
 
@@ -18,10 +18,10 @@ foreach ($procId in $pids) {
 
 if ($pids) { Start-Sleep -Seconds 2 }
 
-Write-Host "Building JanomeHR.Web..." -ForegroundColor Cyan
-dotnet build JanomeHR.Web\JanomeHR.Web.csproj -v q
+Write-Host "Building WangNganHR.Web..." -ForegroundColor Cyan
+dotnet build WangNganHR.Web\WangNganHR.Web.csproj -v q
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-Write-Host "Starting JanomeHR.Web at http://localhost:$port ..." -ForegroundColor Cyan
+Write-Host "Starting WangNganHR.Web at http://localhost:$port ..." -ForegroundColor Cyan
 Write-Host "Hard refresh browser: Ctrl+Shift+R" -ForegroundColor DarkGray
-dotnet run --project JanomeHR.Web --launch-profile http --no-build
+dotnet run --project WangNganHR.Web --launch-profile http --no-build

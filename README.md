@@ -147,31 +147,6 @@ Draft / Open · เงินเดือน · QR Code
 
 ---
 
-## 🏗️ สถาปัตยกรรม
-
-```mermaid
-flowchart LR
-    subgraph Client
-        D[Desktop WPF]
-        W[Web Blazor]
-    end
-
-    subgraph Backend
-        A[API .NET 10]
-        H[Hangfire]
-    end
-
-    subgraph Data
-        P[(PostgreSQL)]
-        R[(Redis)]
-    end
-
-    D --> A
-    W --> A
-    A --> P
-    A --> R
-    H --> P
-```
 
 | โปรเจกต์ | เทคโนโลยี | พอร์ต |
 |----------|-----------|-------|
